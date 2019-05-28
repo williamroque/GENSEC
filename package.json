@@ -1,0 +1,30 @@
+{
+  "name": "gensec",
+  "productName": "GENSEC",
+  "version": "1.0.0",
+  "description": "",
+  "build": {
+    "appId": "com.ethos.gensec",
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icon.png"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png"
+    }
+  },
+  "scripts": {
+    "start": "electron .",
+    "dist-all": "electron-builder -mw",
+    "dist": "electron-builder"
+  },
+  "main": "./mjs/main.js",
+  "author": "William Roque",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^4.1.4",
+    "electron-builder": "^20.40.2"
+  },
+  "dependencies": {}
+}
