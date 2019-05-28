@@ -1,0 +1,14 @@
+#sidebar {
+    height: 100%;
+    width: 30px;
+    background: #0a0a0a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#sidebar-button {
+    color: #C0B283;
+    width: 25px;
+    height: 25px;
+}
