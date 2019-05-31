@@ -3,7 +3,7 @@
         [
             {
                 "type": "text",
-                "label": "Fun&ccedil;&atilde;o"
+                "label": "Fun\u00E7\u00E3o"
             }
         ],
         [
@@ -29,7 +29,7 @@
             },
             {
                 "type": "text",
-                "label": "Pa&iacute;s",
+                "label": "Pa\u00EDs",
                 "fill": "25"
             }
         ],
@@ -64,7 +64,7 @@
         [
             {
                 "type": "textarea",
-                "label": "Descri&ccedil;",
+                "label": "Descri\u00E7\u00E3o",
                 "fill": "5"
             }
         ],
