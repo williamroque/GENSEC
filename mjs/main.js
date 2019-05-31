@@ -15,6 +15,9 @@ const mainWinObject = {
     maxWidth: 1150,
     maxHeight: 770,
     fullscreen: false,
+    webPreferences: {
+        nodeIntegration: true
+    }
 };
 
 // Main window

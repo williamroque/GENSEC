@@ -1,0 +1,23 @@
+{
+    "filesystem": [
+        {
+            "type": "directory",
+            "name": "Empreendimentos",
+            "id": "empreendimentos",
+            "content": [
+                {
+                    "type": "directory",
+                    "name": "Integrantes da Opera&ccedil;&atilde;o",
+                    "id": "integrantes-operacao",
+                    "content": [
+                        {
+                            "type": "form",
+                            "location": "remote",
+                            "path": "integrante.json"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

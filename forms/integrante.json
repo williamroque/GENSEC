@@ -1,0 +1,78 @@
+{
+    "form": [
+        [
+            {
+                "type": "text",
+                "label": "Fun&ccedil;&atilde;o"
+            }
+        ],
+        [
+            {
+                "type": "text",
+                "label": "Rua",
+                "fill": "25"
+            },
+            {
+                "type": "text",
+                "label": "Bairro",
+                "fill": "25"
+            },
+            {
+                "type": "text",
+                "label": "Cidade",
+                "fill": "20"
+            },
+            {
+                "type": "text",
+                "label": "Estado",
+                "fill": "5"
+            },
+            {
+                "type": "text",
+                "label": "Pa&iacute;s",
+                "fill": "25"
+            }
+        ],
+        [
+            {
+                "type": "text",
+                "label": "complemento"
+            },
+            {
+                "type": "text",
+                "label": "cep",
+                "script": [
+                    "change = dom => {",
+                        "const http = require('http');",
+                        "let data = '';",
+                        "http.get('https://viacep.com.br/ws/01001000/json/', resp => {",
+                            "resp.on('data', chunk => {",
+                                "data += chunck;",
+                            "});",
+                        "}).on('error', err => console.log(err));",
+                        "data = JSON.parse(data);",
+                        "const { logradouro, complemento, bairro, localidade, uf } = data;",
+                        "dom['Rua'].value = logradouro || dom['Rua'].value;",
+                        "dom['complemento'].value = complemento || dom['Complemento'].value;",
+                        "dom['Bairro'].value = bairro || dom['Bairro'].value;",
+                        "dom['Cidade'].value = localidade || dom['Cidade'].value;",
+                        "dom['Estado'].value = uf || dom['Estado'].value;",
+                    "};"
+                ]
+            }
+        ],
+        [
+            {
+                "type": "textarea",
+                "label": "Descri&ccedil;",
+                "fill": "5"
+            }
+        ],
+        [
+            {
+                "type": "submit",
+                "label": "Salvar"
+            }
+        ]
+    ]
+}
