@@ -5,18 +5,18 @@ const index = './forms/filesystem.json';
 let indexData = fs.readFileSync(index);
 indexData = JSON.parse(indexData).filesystem;
 
-let virtualPath = '/';
+let virtualPath = [];
 
 let dom = {};
 
 let directoryList = document.createElement('ul');
 
 function createList() {
-    const path = virtualPath.split('/');
     let pathData = indexData;
 
-    for (let file of path) {
-        pathData = file.content;
+    for (let directory of virtualPath) {
+
+        pathData = directory.content;
     }
 
     pathData.forEach(file => {
@@ -44,6 +44,6 @@ function render(wrapper) {
 
 for (let key in dom) {
     dom[key].addEventListener('click', () => {
-        virtualPath 
+        virtualPath.push(key);
     }, false);
 }
