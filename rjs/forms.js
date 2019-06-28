@@ -19,6 +19,7 @@ let dom = {};
 
 // List of directories for user navigation
 let directoryList = document.createElement('ul');
+directoryList.setAttribute('id', 'directory-list');
 
 // Create list of directories based on current directory of JSON filesystem
 function createList() {
@@ -62,6 +63,20 @@ function createList() {
         // Add list item to list of directories
         directoryList.appendChild(dom[name]);
     });
+
+    // Add click event listener to each "DOM" element
+    Object.keys(dom).forEach(key => {
+        dom[key].addEventListener('click', () => {
+            // Reset "DOM"
+            dom = {};
+
+            // Add file (directory/form) name to virtual path
+            virtualPath.push(key);
+
+            // Update display
+            update();
+        }, false);
+    });
 }
 
 // Relieve parent node of now redundant children
@@ -80,43 +95,73 @@ function render(content, wrapper) {
 
 // Update wrappers
 function update() {
+    // Clear directory list
+    clearNode(directoryList);
     // Update directory list
     createList();
-
     // Render directory list
     render(directoryList, contentWrapper);
+
+    // Clear navigation bar
+    clearNode(navigationBar);
 
     // For each virtual path element (with home added at the beginning),
     // concatenate to navigation bar
     virtualPath = [''].concat(virtualPath).map(file => {
+        // Create wrapper element
+        const wrapperElem = document.createElement('span');
+
         // Create directory element
-        const elem = document.createElement('span');
+        const directoryElem = document.createElement('span');
         // Create text for directory element
-        const elementText = document.createTextNode(file + '/');
+        const directoryElemText = document.createTextNode(file);
+
+        // Set class for element
+        directoryElem.setAttribute('class', 'dir-label');
+
+        // Change to span path on click
+        wrapperElem.addEventListener('click', e => {
+            // Get clicked element text
+            let text = e.target.innerText;
+            // Remove directory slash from end of text
+            text = text.slice(0, text.length - 1 || 1);
+
+            // Handle home directory
+            if (text === '/') {
+                virtualPath = [];
+                update();
+                return;
+            }
+
+            // Cut current path to clicked directory
+            virtualPath = virtualPath.slice(0, virtualPath.indexOf(text));
+
+            update();
+        }, false);
 
         // Append text to directory element
-        elem.appendChild(elementText);
+        directoryElem.appendChild(directoryElemText);
+
+        // Directory slash
+        const slashElem = document.createElement('span');
+        // Slash class
+        slashElem.setAttribute('class', 'dir-slash');
+        // Slash text
+        const slashText = document.createTextNode('/');
+        // Append slash text to element
+        slashElem.appendChild(slashText);
         
+        // Append directory and slash elements to directory wrapper
+        wrapperElem.appendChild(directoryElem);
+        wrapperElem.appendChild(slashElem);
+
         // Render directory element to navigation bar
-        render(elem, navigationBar);
+        navigationBar.appendChild(wrapperElem);
 
     // Remove home directory from virtual path
     }).slice(1, virtualPath.length);
+
 }
 
 // Start content display
 update();
-
-// Add click event listener to each "DOM" element
-Object.keys(dom).forEach(key => {
-    dom[key].addEventListener('click', () => {
-        // Reset "DOM"
-        dom = {};
-
-        // Add file (directory/form) name to virtual path
-        virtualPath.push(key);
-
-        // Update display
-        update();
-    }, false);
-});
