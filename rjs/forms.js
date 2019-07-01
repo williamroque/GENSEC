@@ -21,20 +21,11 @@ let dom = {};
 let directoryList = document.createElement('ul');
 directoryList.setAttribute('id', 'directory-list');
 
+// Default data for home path
+let pathData = indexData;
+
 // Create list of directories based on current directory of JSON filesystem
 function createList() {
-    // Default data for home path
-    let pathData = indexData;
-
-    // Update data for each directory in the virtual path
-    virtualPath.forEach(file => {
-        // Get object with name listed in virtual path
-        dirObject = pathData.find(elem => elem.name === file);
-
-        // Set current path data to data of virtual path directory
-        pathData = dirObject.content;
-    });
-
     // For each file in current directory
     pathData.forEach(file => {
         // Get type of file (should be form or directory)
@@ -57,6 +48,8 @@ function createList() {
         dom[name] = document.createElement('li');
         // Set directory class for directory list item
         dom[name].setAttribute('class', 'directory');
+        // Set id of list item
+        dom[name].setAttribute('id', id);
         // Add text to list item
         dom[name].appendChild(nameText);
 
@@ -66,12 +59,16 @@ function createList() {
 
     // Add click event listener to each "DOM" element
     Object.keys(dom).forEach(key => {
-        dom[key].addEventListener('click', () => {
+        dom[key].addEventListener('click', e => {
             // Reset "DOM"
             dom = {};
 
             // Add file (directory/form) name to virtual path
             virtualPath.push(key);
+
+            // Set path data to current path
+            const id = e.target.id;
+            pathData = pathData.find(file => file.id === id).content;
 
             // Update display
             update();
@@ -107,7 +104,7 @@ function update() {
 
     // For each virtual path element (with home added at the beginning),
     // concatenate to navigation bar
-    virtualPath = [''].concat(virtualPath).map(file => {
+    [''].concat(virtualPath).forEach(file => {
         // Create wrapper element
         const wrapperElem = document.createElement('span');
 
@@ -159,8 +156,7 @@ function update() {
         navigationBar.appendChild(wrapperElem);
 
     // Remove home directory from virtual path
-    }).slice(1, virtualPath.length);
-
+    });
 }
 
 // Start content display

@@ -6,20 +6,11 @@
             "id": "empreendimentos",
             "content": [
                 {
-                    "type": "directory",
+                    "type": "form",
                     "name": "Integrantes da Opera\u00E7\u00E3o",
                     "id": "integrantes-operacao",
                     "location": "remote",
-                    "path": "integrante.json",
-                    "content": [
-                        {
-                            "type": "form",
-                            "name": "Integrantes da Opera\u00E7\u00E3o",
-                            "id": "integrantes-operacao",
-                            "location": "remote",
-                            "path": "integrante.json"
-                        }
-                    ]
+                    "path": "integrante.json"
                 }
             ]
         }
