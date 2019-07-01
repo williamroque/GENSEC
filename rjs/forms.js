@@ -2,7 +2,7 @@
 const fs = require('fs');
 
 // Starting point for JSON data
-const index = './forms/filesystem.json';
+const index = 'forms/filesystem.json';
 // Parsed data starting point
 const indexData = JSON.parse(fs.readFileSync(index)).filesystem;
 
@@ -18,7 +18,7 @@ let virtualPath = [];
 let dom = {};
 
 // List of directories for user navigation
-let directoryList = document.createElement('ul');
+let directoryList = document.createElement('UL');
 directoryList.setAttribute('id', 'directory-list');
 
 // Default data for home path
@@ -26,7 +26,7 @@ let pathData = indexData;
 
 // Create list of directories based on current directory of JSON filesystem
 function createList() {
-    // For each file in current directory
+    // For each file in current directory, add to directory listing
     pathData.forEach(file => {
         // Get type of file (should be form or directory)
         const type = file.type;
@@ -45,7 +45,7 @@ function createList() {
         const nameText = document.createTextNode(name);
 
         // Create list element for directory
-        dom[name] = document.createElement('li');
+        dom[name] = document.createElement('LI');
         // Set directory class for directory list item
         dom[name].setAttribute('class', 'directory');
         // Set id of list item
@@ -66,9 +66,22 @@ function createList() {
             // Add file (directory/form) name to virtual path
             virtualPath.push(key);
 
-            // Set path data to current path
+            // Selected file
             const id = e.target.id;
-            pathData = pathData.find(file => file.id === id).content;
+            const fileObject = pathData.find(file => file.id === id);
+
+            if (fileObject.type === 'directory') {
+                pathData = fileObject.content;
+            } else {
+                let data = [];
+                if (fileObject.location === 'remote') {
+                    data = JSON.parse(fs.readFileSync('forms/' + fileObject.path));
+                } else {
+                    data = fileObject.form;
+                }
+                renderForm(data);
+                return;
+            }
 
             // Update display
             update();
@@ -76,10 +89,66 @@ function createList() {
     });
 }
 
+// Render form data
+function renderForm(data) {
+    const formTable = document.createElement('TABLE');
+    formTable.setAttribute('class', 'form-table');
+
+    data.form.forEach((row, i) => {
+        const rowElement = document.createElement('TR');
+        rowElement.setAttribute('class', 'form-row');
+
+        row.forEach((col, j) => {
+            const colElement = document.createElement('TD');
+            colElement.setAttribute('class', 'form-col');
+
+            const colId = 'col-' + i + j;
+
+            const inputElement = document.createElement('INPUT');
+            inputElement.setAttribute('type', col.type);
+            inputElement.setAttribute('id', colId);
+            inputElement.style.width = col.fill + '%';
+            
+            const labelElement = document.createElement('INPUT');
+            labelElement.setAttribute('for', colId);
+
+            if (col.label) {
+                const labelText = document.createTextNode(col.label);
+                labelElement.appendChild(labelText);
+            }
+
+            if (col.value) {
+                inputElement.setAttribute('value', col.value);
+            }
+
+            let click = () => {};
+            let change = () => {};
+            let keydown = () => {};
+
+            if (col.script) eval(col.script);
+
+            inputElement.addEventListener('click', click, false);
+            inputElement.addEventListener('change', change, false);
+            inputElement.addEventListener('keydown', keydown, false);
+
+            colElement.appendChild(inputElement);
+
+            rowElement.appendChild(colElement);
+        });
+
+        formTable.appendChild(rowElement);
+
+        console.log(rowElement);
+    });
+
+    render(formTable, contentWrapper);
+}
+
 // Relieve parent node of now redundant children
 function clearNode(node) {
     // While node has at least one child, remove first child
     while (node.firstChild) {
+        console.log('Removing...');
         node.removeChild(node.firstChild);
     }
 }
@@ -106,10 +175,10 @@ function update() {
     // concatenate to navigation bar
     [''].concat(virtualPath).forEach(file => {
         // Create wrapper element
-        const wrapperElem = document.createElement('span');
+        const wrapperElem = document.createElement('SPAN');
 
         // Create directory element
-        const directoryElem = document.createElement('span');
+        const directoryElem = document.createElement('SPAN');
         // Create text for directory element
         const directoryElemText = document.createTextNode(file);
 
@@ -140,7 +209,7 @@ function update() {
         directoryElem.appendChild(directoryElemText);
 
         // Directory slash
-        const slashElem = document.createElement('span');
+        const slashElem = document.createElement('SPAN');
         // Slash class
         slashElem.setAttribute('class', 'dir-slash');
         // Slash text

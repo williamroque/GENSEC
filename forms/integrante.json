@@ -71,7 +71,7 @@
         [
             {
                 "type": "submit",
-                "label": "Salvar"
+                "value": "Salvar"
             }
         ]
     ]
