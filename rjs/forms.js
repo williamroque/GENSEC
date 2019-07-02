@@ -45,26 +45,23 @@ function createList() {
         const nameText = document.createTextNode(name);
 
         // Create list element for directory
-        dom[name] = document.createElement('LI');
+        const listItem = document.createElement('LI');
         // Set directory class for directory list item
-        dom[name].setAttribute('class', 'directory');
+        listItem.setAttribute('class', 'directory');
         // Set id of list item
-        dom[name].setAttribute('id', id);
+        listItem.setAttribute('id', id);
         // Add text to list item
-        dom[name].appendChild(nameText);
+        listItem.appendChild(nameText);
 
         // Add list item to list of directories
-        directoryList.appendChild(dom[name]);
+        directoryList.appendChild(listItem);
     });
 
-    // Add click event listener to each "DOM" element
-    Object.keys(dom).forEach(key => {
-        dom[key].addEventListener('click', e => {
-            // Reset "DOM"
-            dom = {};
-
+    // Add click event listener to each list item element
+    directoryList.childNodes.forEach(node => {
+        node.addEventListener('click', e => {
             // Add file (directory/form) name to virtual path
-            virtualPath.push(key);
+            virtualPath.push(node.innerText);
 
             // Selected file
             const id = e.target.id;
@@ -90,8 +87,8 @@ function createList() {
 }
 
 // Function for setting label or input class
-function addInputClass(className, index, e) {
-    e.target
+function addInputClass(className, index, input) {
+    input
         .parentNode
         .childNodes[index]
         .classList
@@ -99,12 +96,33 @@ function addInputClass(className, index, e) {
 }
 
 // Function for resetting label or input class
-function removeInputClass(className, index, e) {
-    e.target
+function removeInputClass(className, index, input) {
+    input
         .parentNode
         .childNodes[index]
         .classList
         .remove(className);
+}
+
+// Refresh state of input and label
+function refreshState(input) {
+    if (input.tagName.toLowerCase() === 'input' && input.type === 'text') {
+        if (input.value !== '') {
+            addInputClass('form-text-input-label-active', 0, input);
+            addInputClass('form-text-input-active', 1, input);
+        } else {
+            removeInputClass('form-text-input-label-active', 0, input);
+            removeInputClass('form-text-input-active', 1, input);
+        }
+    } else if (input.tagName.toLowerCase() === 'textarea') {
+        if (input.value !== '') {
+            addInputClass('form-textarea-label-active', 0, input);
+            addInputClass('form-textarea-active', 1, input);
+        } else {
+            removeInputClass('form-textarea-label-active', 0, input);
+            removeInputClass('form-textarea-active', 1, input);
+        }
+    }
 }
 
 // Render form data
@@ -159,40 +177,24 @@ function renderForm(data) {
             }
 
             let click = () => {};
-            let change = () => {};
+            let change = (_, e) => refreshState(e.target);
             let keydown = () => {};
 
-            if (col.script) eval(col.script);
+            if (col.script) {
+                eval(col.script.join('\n'));
+            }
 
             inputElement.addEventListener('click', e => {
                 click(dom, e);
             }, false);
             inputElement.addEventListener('change', e => {
                 change(dom, e);
-
-                console.log(e.target.tagName.toLowerCase(), e.target.type);
-
-                if (e.target.tagName.toLowerCase() === 'input' && e.target.type === 'text') {
-                    if (e.target.value !== '') {
-                        addInputClass('form-text-input-label-active', 0, e);
-                        addInputClass('form-text-input-active', 1, e);
-                    } else {
-                        removeInputClass('form-text-input-label-active', 0, e);
-                        removeInputClass('form-text-input-active', 1, e);
-                    }
-                } else if (e.target.tagName.toLowerCase() === 'textarea') {
-                    if (e.target.value !== '') {
-                        addInputClass('form-textarea-label-active', 0, e);
-                        addInputClass('form-textarea-active', 1, e);
-                    } else {
-                        removeInputClass('form-textarea-label-active', 0, e);
-                        removeInputClass('form-textarea-active', 1, e);
-                    }
-                }
             }, false);
             inputElement.addEventListener('keydown', e => {
                 keydown(dom, e);
             }, false);
+
+            dom[col.label] = inputElement;
 
             colElement.appendChild(inputElement);
 
