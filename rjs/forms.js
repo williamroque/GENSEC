@@ -89,32 +89,69 @@ function createList() {
     });
 }
 
+// Function for setting label or input class
+function addInputClass(className, index, e) {
+    e.target
+        .parentNode
+        .childNodes[index]
+        .classList
+        .add(className);
+}
+
+// Function for resetting label or input class
+function removeInputClass(className, index, e) {
+    e.target
+        .parentNode
+        .childNodes[index]
+        .classList
+        .remove(className);
+}
+
 // Render form data
 function renderForm(data) {
-    const formTable = document.createElement('TABLE');
+    const formTable = document.createElement('DIV');
     formTable.setAttribute('class', 'form-table');
 
     data.form.forEach((row, i) => {
-        const rowElement = document.createElement('TR');
+        const rowElement = document.createElement('DIV');
         rowElement.setAttribute('class', 'form-row');
 
         row.forEach((col, j) => {
-            const colElement = document.createElement('TD');
+            const colElement = document.createElement('DIV');
             colElement.setAttribute('class', 'form-col');
 
             const colId = 'col-' + i + j;
 
-            const inputElement = document.createElement('INPUT');
-            inputElement.setAttribute('type', col.type);
+            let inputElement;
+
+            if (col.type === 'textarea') {
+                inputElement = document.createElement('TEXTAREA');
+
+                inputElement.style.height = col.rows + 'em';
+                inputElement.style.width = col.cols + 'em';
+            } else {
+                inputElement = document.createElement('INPUT');
+                colElement.style.width = col.fill + '%';
+                inputElement.setAttribute('type', col.type);
+            }
+
+            inputElement.setAttribute('class', 'form-input');
             inputElement.setAttribute('id', colId);
-            inputElement.style.width = col.fill + '%';
-            
-            const labelElement = document.createElement('INPUT');
-            labelElement.setAttribute('for', colId);
 
             if (col.label) {
+                const labelElement = document.createElement('LABEL');
+                labelElement.setAttribute('for', colId);
+
+                if (col.type === 'text') {
+                    labelElement.setAttribute('class', 'form-text-input-label');
+                } else {
+                    labelElement.setAttribute('class', 'form-textarea-label');
+                }
+
                 const labelText = document.createTextNode(col.label);
                 labelElement.appendChild(labelText);
+            
+                colElement.appendChild(labelElement);
             }
 
             if (col.value) {
@@ -127,9 +164,35 @@ function renderForm(data) {
 
             if (col.script) eval(col.script);
 
-            inputElement.addEventListener('click', click, false);
-            inputElement.addEventListener('change', change, false);
-            inputElement.addEventListener('keydown', keydown, false);
+            inputElement.addEventListener('click', e => {
+                click(dom, e);
+            }, false);
+            inputElement.addEventListener('change', e => {
+                change(dom, e);
+
+                console.log(e.target.tagName.toLowerCase(), e.target.type);
+
+                if (e.target.tagName.toLowerCase() === 'input' && e.target.type === 'text') {
+                    if (e.target.value !== '') {
+                        addInputClass('form-text-input-label-active', 0, e);
+                        addInputClass('form-text-input-active', 1, e);
+                    } else {
+                        removeInputClass('form-text-input-label-active', 0, e);
+                        removeInputClass('form-text-input-active', 1, e);
+                    }
+                } else if (e.target.tagName.toLowerCase() === 'textarea') {
+                    if (e.target.value !== '') {
+                        addInputClass('form-textarea-label-active', 0, e);
+                        addInputClass('form-textarea-active', 1, e);
+                    } else {
+                        removeInputClass('form-textarea-label-active', 0, e);
+                        removeInputClass('form-textarea-active', 1, e);
+                    }
+                }
+            }, false);
+            inputElement.addEventListener('keydown', e => {
+                keydown(dom, e);
+            }, false);
 
             colElement.appendChild(inputElement);
 
@@ -137,8 +200,6 @@ function renderForm(data) {
         });
 
         formTable.appendChild(rowElement);
-
-        console.log(rowElement);
     });
 
     render(formTable, contentWrapper);
@@ -148,7 +209,6 @@ function renderForm(data) {
 function clearNode(node) {
     // While node has at least one child, remove first child
     while (node.firstChild) {
-        console.log('Removing...');
         node.removeChild(node.firstChild);
     }
 }

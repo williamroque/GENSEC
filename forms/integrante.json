@@ -3,7 +3,8 @@
         [
             {
                 "type": "text",
-                "label": "Fun\u00E7\u00E3o"
+                "label": "Fun\u00E7\u00E3o",
+                "fill": "100"
             }
         ],
         [
@@ -15,7 +16,7 @@
             {
                 "type": "text",
                 "label": "Bairro",
-                "fill": "25"
+                "fill": "20"
             },
             {
                 "type": "text",
@@ -25,22 +26,24 @@
             {
                 "type": "text",
                 "label": "Estado",
-                "fill": "5"
+                "fill": "15"
             },
             {
                 "type": "text",
                 "label": "Pa\u00EDs",
-                "fill": "25"
+                "fill": "20"
             }
         ],
         [
             {
                 "type": "text",
-                "label": "complemento"
+                "label": "Complemento",
+                "fill": "50"
             },
             {
                 "type": "text",
-                "label": "cep",
+                "label": "CEP",
+                "fill": "50",
                 "script": [
                     "change = dom => {",
                         "const http = require('http');",
@@ -65,13 +68,14 @@
             {
                 "type": "textarea",
                 "label": "Descri\u00E7\u00E3o",
-                "fill": "5"
+                "rows": "5",
+                "cols": "20"
             }
         ],
         [
             {
                 "type": "submit",
-                "value": "Salvar"
+                "value": "SALVAR"
             }
         ]
     ]
