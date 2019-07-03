@@ -1,29 +1,3 @@
-// To read JSON files
-const fs = require('fs');
-
-// Starting point for JSON data
-const index = 'forms/filesystem.json';
-// Parsed data starting point
-const indexData = JSON.parse(fs.readFileSync(index)).filesystem;
-
-// Wrapper for form and directory content
-const contentWrapper = document.querySelector('#main-content');
-// Wrapper for navigation bar content
-const navigationBar = document.querySelector('#navigate');
-
-// Virtual path for current directory in JSON-based filesystem
-let virtualPath = [];
-
-// "DOM"; elements accessible by forms
-let dom = {};
-
-// List of directories for user navigation
-let directoryList = document.createElement('UL');
-directoryList.setAttribute('id', 'directory-list');
-
-// Default data for home path
-let pathData = indexData;
-
 // Create list of directories based on current directory of JSON filesystem
 function createList() {
     // For each file in current directory, add to directory listing
@@ -69,24 +43,22 @@ function createList() {
 
             if (fileObject.type === 'directory') {
                 pathData = fileObject.content;
+                update(true);
             } else {
                 let data = [];
                 if (fileObject.location === 'remote') {
                     data = JSON.parse(fs.readFileSync('forms/' + fileObject.path));
+
                 } else {
                     data = fileObject.form;
                 }
+                update(false);
                 renderForm(data);
-                return;
             }
-
-            // Update display
-            update();
         }, false);
     });
 }
 
-// Function for setting label or input class
 function addInputClass(className, index, input) {
     input
         .parentNode
@@ -95,7 +67,6 @@ function addInputClass(className, index, input) {
         .add(className);
 }
 
-// Function for resetting label or input class
 function removeInputClass(className, index, input) {
     input
         .parentNode
@@ -104,7 +75,6 @@ function removeInputClass(className, index, input) {
         .remove(className);
 }
 
-// Refresh state of input and label
 function refreshState(input) {
     if (input.tagName.toLowerCase() === 'input' && input.type === 'text') {
         if (input.value !== '') {
@@ -125,7 +95,6 @@ function refreshState(input) {
     }
 }
 
-// Render form data
 function renderForm(data) {
     const formTable = document.createElement('DIV');
     formTable.setAttribute('class', 'form-table');
@@ -206,89 +175,3 @@ function renderForm(data) {
 
     render(formTable, contentWrapper);
 }
-
-// Relieve parent node of now redundant children
-function clearNode(node) {
-    // While node has at least one child, remove first child
-    while (node.firstChild) {
-        node.removeChild(node.firstChild);
-    }
-}
-
-// Clear wrapper, then render content to it
-function render(content, wrapper) {
-    clearNode(wrapper);
-    wrapper.appendChild(content);
-}
-
-// Update wrappers
-function update() {
-    // Clear directory list
-    clearNode(directoryList);
-    // Update directory list
-    createList();
-    // Render directory list
-    render(directoryList, contentWrapper);
-
-    // Clear navigation bar
-    clearNode(navigationBar);
-
-    // For each virtual path element (with home added at the beginning),
-    // concatenate to navigation bar
-    [''].concat(virtualPath).forEach(file => {
-        // Create wrapper element
-        const wrapperElem = document.createElement('SPAN');
-
-        // Create directory element
-        const directoryElem = document.createElement('SPAN');
-        // Create text for directory element
-        const directoryElemText = document.createTextNode(file);
-
-        // Set class for element
-        directoryElem.setAttribute('class', 'dir-label');
-
-        // Change to span path on click
-        wrapperElem.addEventListener('click', e => {
-            // Get clicked element text
-            let text = e.target.innerText;
-            // Remove directory slash from end of text
-            text = text.slice(0, text.length - 1 || 1);
-
-            // Handle home directory
-            if (text === '/') {
-                virtualPath = [];
-                update();
-                return;
-            }
-
-            // Cut current path to clicked directory
-            virtualPath = virtualPath.slice(0, virtualPath.indexOf(text));
-
-            update();
-        }, false);
-
-        // Append text to directory element
-        directoryElem.appendChild(directoryElemText);
-
-        // Directory slash
-        const slashElem = document.createElement('SPAN');
-        // Slash class
-        slashElem.setAttribute('class', 'dir-slash');
-        // Slash text
-        const slashText = document.createTextNode('/');
-        // Append slash text to element
-        slashElem.appendChild(slashText);
-        
-        // Append directory and slash elements to directory wrapper
-        wrapperElem.appendChild(directoryElem);
-        wrapperElem.appendChild(slashElem);
-
-        // Render directory element to navigation bar
-        navigationBar.appendChild(wrapperElem);
-
-    // Remove home directory from virtual path
-    });
-}
-
-// Start content display
-update();
