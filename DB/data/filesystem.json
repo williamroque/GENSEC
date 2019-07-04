@@ -1,0 +1,8 @@
+{
+    "filesystem": [
+        {
+            "path": "integrantes.csv",
+            "id": "integrantes"
+        }
+    ]
+}
