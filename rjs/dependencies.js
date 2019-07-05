@@ -14,6 +14,17 @@ const navigationBar = document.querySelector('#navigate');
 // Virtual path for current directory in JSON-based filesystem
 let virtualPath = [];
 
+const data = requestData('integrantes.csv');
+
+// Whether the currently selected option is to filter, add/edit, or build
+let currentAction;
+
+let Actions = {
+    FILTER: 1,
+    MUTATE: 2,
+    CREATE: 3
+};
+
 // List of directories for user navigation
 let directoryList = document.createElement('UL');
 directoryList.setAttribute('id', 'directory-list');
