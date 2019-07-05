@@ -23,6 +23,9 @@ class DataClientThread(threading.Thread):
 
                 self.sort()
 
+            return False
+        else:
+            return True
     def as_string(self):
         return '\n'.join([';'.join(row) for row in self.data])
 
@@ -69,7 +72,13 @@ class DataClientThread(threading.Thread):
             if command == 'request_data':
                 path = 'data/' + body
 
-                self.load_data(path)
+                break_requested = self.load_data(path)
+                if break_requested:
+                    print(path, 'not found.')
+                    self.connection.send(b'exit')
+                    self.connection.close()
+                    break
+
                 data = self.as_string()
                 self.connection.send(data.encode('utf-8'))
 
@@ -78,7 +87,10 @@ class DataClientThread(threading.Thread):
             elif command == 'add':
                 row, file = body.split('|')
 
-                self.load_data(file)
+                break_requested = self.load_data(path)
+                if break_requested:
+                    self.connection.send(b'exit')
+                    break
 
                 row = np.array([int(x) for x in row.split(';')])
 
@@ -87,7 +99,10 @@ class DataClientThread(threading.Thread):
             elif command == 'delete':
                 row, file = body.split('|')
 
-                self.load_data(file)
+                break_requested = self.load_data(path)
+                if break_requested:
+                    self.connection.send(b'exit')
+                    break
 
                 row = np.array([int(x) for x in row.split(';')])
 
