@@ -4,20 +4,24 @@ import numpy as np
 
 import fcntl
 
+import os
+
 class DataClientThread(threading.Thread):
     def __init__(self, conn, ip, port):
         super().__init__()
 
         self.connection = conn
 
-        with open('data/integrantes.csv', 'r') as f:
-            rows = f.read().split('\n')
-            list_data = [row.split(';') for row in rows]
-            self.data = np.array(list_data)
-
-        self.sort()
-
         print('Thread started for client {} at port {}'.format(ip, port))
+
+    def load_data(self, path):
+        if os.path.exists(path):
+            with open(path, 'r') as f:
+                rows = f.read().split('\n')
+                list_data = [row.split(';') for row in rows]
+                self.data = np.array(list_data)
+
+                self.sort()
 
     def as_string(self):
         return '\n'.join([';'.join(row) for row in self.data])
@@ -59,23 +63,33 @@ class DataClientThread(threading.Thread):
             message_rows = mes.split('\n') + ['']
             command, body, *_ = message_rows
 
-            if command == 'request_data':
-                data = self.as_string()
+            if command:
+                print(command, body)
 
+            if command == 'request_data':
+                path = 'data/' + body
+
+                self.load_data(path)
+                data = self.as_string()
                 self.connection.send(data.encode('utf-8'))
+
                 self.connection.send(b'exit')
 
             elif command == 'add':
                 row, file = body.split('|')
-                row = np.array([int(x) for x in row.split(';')])
 
-                print(row, file)
+                self.load_data(file)
+
+                row = np.array([int(x) for x in row.split(';')])
 
                 self.add(row, file)
 
             elif command == 'delete':
                 row, file = body.split('|')
-                row = row.split(';')
+
+                self.load_data(file)
+
+                row = np.array([int(x) for x in row.split(';')])
 
                 self.delete(row, file)
 

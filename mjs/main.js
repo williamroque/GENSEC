@@ -1,10 +1,9 @@
-// Electron app import
 const { app, dialog } = require('electron');
 
-// Window class import
 const Window = require('./window');
 
-// Main window properties
+const data = require('./db');
+
 const mainWinObject = {
     width: 1150,
     height: 750,
@@ -20,13 +19,10 @@ const mainWinObject = {
     }
 };
 
-// Main window
 let mainWin;
 
-// Create main window as Window object 
 const createWindow = () => mainWin = new Window(mainWinObject);
 
-// Create window when ready
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
@@ -41,3 +37,4 @@ app.on('activate', () => {
     }
 });
 
+console.log(data);

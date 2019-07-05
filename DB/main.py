@@ -11,7 +11,7 @@ import threading
 ip = '0.0.0.0'
 
 # Port for data server
-data_port = 8888
+data_port = 5000
 
 # Server class implemented in data_server module
 data_server = data_server.DataServer(ip, data_port)
