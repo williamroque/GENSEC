@@ -27,7 +27,5 @@
     "electron": "^4.1.4",
     "electron-builder": "^20.40.2"
   },
-  "dependencies": {
-    "ping-monitor": "^0.4.4"
-  }
+  "dependencies": {}
 }
