@@ -1,3 +1,5 @@
+const mutateOption = document.querySelector('#edit-contract');
+
 function createList() {
     pathData.forEach(file => {
         const type = file.type;
@@ -160,3 +162,11 @@ function renderForm(data) {
 
     render(formTable, contentWrapper);
 }
+
+mutateOption.addEventListener('click', () => {
+    currentActionElement.classList.remove('option-selected');
+    mutateOption.classList.add('option-selected');
+
+    currentActionElement = mutateOption;
+    currentAction = Actions.MUTATE;
+}, false);

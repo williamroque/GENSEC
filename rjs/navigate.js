@@ -19,30 +19,32 @@ function createList() {
         directoryList.appendChild(listItem);
     });
 
-   directoryList.childNodes.forEach(node => {
+    directoryList.childNodes.forEach(node => {
         node.addEventListener('click', e => {
-           virtualPath.push(node.innerText);
+            if (virtualPath[virtualPath.length - 1] !== node.innerText) {
+                virtualPath.push(node.innerText);
 
-           const id = e.target.id;
-            const fileObject = pathData.find(file => file.id === id);
+                const id = e.target.id;
+                const fileObject = pathData.find(file => file.id === id);
 
-            if (fileObject.type === 'directory') {
-                pathData = fileObject.content;
-                update(true);
-            } else {
-                let formData = [];
-                if (fileObject.location === 'remote') {
-                    formData = JSON.parse(fs.readFileSync('forms/' + fileObject.path));
-
+                if (fileObject.type === 'directory') {
+                    pathData = fileObject.content;
+                    update(true);
                 } else {
-                    formData = fileObject.form;
-                }
+                    let formData = [];
+                    if (fileObject.location === 'remote') {
+                        formData = JSON.parse(fs.readFileSync('forms/' + fileObject.path));
 
-                update(false);
-                if (currentAction === Action.FILTER) {
-                    renderFilterTable(formData);
-                } else if (currentAction === Action.MUTATE) {
-                    renderForm(fileObject, formData);
+                    } else {
+                        formData = fileObject.form;
+                    }
+
+                    update(false);
+                    if (currentAction === Actions.FILTER) {
+                        renderFilterTable(fileObject, formData);
+                    } else if (currentAction === Actions.MUTATE) {
+                        renderForm(formData);
+                    }
                 }
             }
         }, false);

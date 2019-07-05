@@ -13,8 +13,10 @@ let virtualPath = [];
 let dataBody;
 
 // Whether the currently selected option is to filter, add/edit, or build
+const filterOption = document.querySelector('#filter');
+
 let currentAction;
-let currentActionElement;
+let currentActionElement = filterOption;
 
 let Actions = {
     FILTER: 1,
@@ -48,5 +50,3 @@ function parseData(data) {
     return rows.map(row => row.split(';'));
 }
 
-dataBody = parseData(requestData('integrantes.csv'));
-console.log(dataBody);

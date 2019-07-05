@@ -1,5 +1,3 @@
-const filterOption = document.querySelector('#filter');
-
 function renderFilterTable(formData, form) {
     const tableElement = document.createElement('TABLE');
     tableElement.setAttribute('class', 'filter-table');
@@ -7,6 +5,7 @@ function renderFilterTable(formData, form) {
     const headerRowElement = document.createElement('TR');
     headerRowElement.setAttribute('class', 'filter-table-header-row');
 
+    console.log(formData, form);
     const headers = form.map(input => input.label);
     headers.forEach(header => {
         const headerElement = document.createElement('TH');
@@ -46,9 +45,7 @@ filterOption.addEventListener('click', () => {
     filterOption.classList.add('option-selected');
 
     currentActionElement = filterOption;
-    currentAction = Action.FILTER;
-
-    
+    currentAction = Actions.FILTER;
 }, false);
 
 
