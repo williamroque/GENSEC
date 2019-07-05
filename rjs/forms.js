@@ -1,43 +1,28 @@
-// Create list of directories based on current directory of JSON filesystem
 function createList() {
-    // For each file in current directory, add to directory listing
     pathData.forEach(file => {
-        // Get type of file (should be form or directory)
         const type = file.type;
-        // Get name of file
         const name = file.name;
-        // Get id of file (for database)
         const id = file.id;
 
-        // Fail for files that are neither forms nor directories
         if (type !== 'form' && type !== 'directory') {
             console.log('Invalid JSON');
             process.exit();
         }
 
-        // Create text element for name
         const nameText = document.createTextNode(name);
 
-        // Create list element for directory
         const listItem = document.createElement('LI');
-        // Set directory class for directory list item
         listItem.setAttribute('class', 'directory');
-        // Set id of list item
         listItem.setAttribute('id', id);
-        // Add text to list item
         listItem.appendChild(nameText);
 
-        // Add list item to list of directories
         directoryList.appendChild(listItem);
     });
 
-    // Add click event listener to each list item element
     directoryList.childNodes.forEach(node => {
         node.addEventListener('click', e => {
-            // Add file (directory/form) name to virtual path
             virtualPath.push(node.innerText);
 
-            // Selected file
             const id = e.target.id;
             const fileObject = pathData.find(file => file.id === id);
 

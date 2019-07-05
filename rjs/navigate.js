@@ -30,15 +30,20 @@ function createList() {
                 pathData = fileObject.content;
                 update(true);
             } else {
-                let data = [];
+                let formData = [];
                 if (fileObject.location === 'remote') {
-                    data = JSON.parse(fs.readFileSync('forms/' + fileObject.path));
+                    formData = JSON.parse(fs.readFileSync('forms/' + fileObject.path));
 
                 } else {
-                    data = fileObject.form;
+                    formData = fileObject.form;
                 }
+
                 update(false);
-                renderForm(data);
+                if (currentAction === Action.FILTER) {
+                    renderFilterTable(formData);
+                } else if (currentAction === Action.MUTATE) {
+                    renderForm(fileObject, formData);
+                }
             }
         }, false);
     });
