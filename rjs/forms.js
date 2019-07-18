@@ -164,9 +164,19 @@ function renderForm(data) {
 }
 
 mutateOption.addEventListener('click', () => {
-    currentActionElement.classList.remove('option-selected');
-    mutateOption.classList.add('option-selected');
+    const from = currentAction;
+    const to = Actions.MUTATE;
 
-    currentActionElement = mutateOption;
-    currentAction = Actions.MUTATE;
+    if (currentAction !== Actions.MUTATE) {
+        currentActionElement.classList.remove('option-selected');
+        mutateOption.classList.add('option-selected');
+
+        currentActionElement = mutateOption;
+        currentAction = Actions.MUTATE;
+
+        let prevOpPos = optionPosition;
+        optionPosition = mutateOption.getBoundingClientRect().top;
+
+        moveOptionSelector(from, to, prevOpPos);
+    }
 }, false);
