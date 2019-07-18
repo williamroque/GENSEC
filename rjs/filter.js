@@ -1,12 +1,12 @@
-function renderFilterTable(formData, form) {
+function renderFilterTable(form, formData) {
     const tableElement = document.createElement('TABLE');
     tableElement.setAttribute('class', 'filter-table');
 
     const headerRowElement = document.createElement('TR');
     headerRowElement.setAttribute('class', 'filter-table-header-row');
 
-    console.log(formData, form);
-    const headers = form.map(input => input.label);
+    const headers = formData.form.flat().filter(input => input.type === 'text' || input.type === 'textarea').map(input => input.label);
+
     headers.forEach(header => {
         const headerElement = document.createElement('TH');
         headerElement.setAttribute('class', 'filter-table-header-column');
@@ -17,14 +17,17 @@ function renderFilterTable(formData, form) {
         headerRowElement.appendChild(headerElement);
     });
 
-    tableElement.appendchild(headerRowElement);
+    tableElement.appendChild(headerRowElement);
 
-    dataBody = requestData(formData.id + '.csv');
-    dataBody.forEach(row => {
+    const tableBody = document.createElement('TBODY');
+    tableBody.setAttribute('class', 'filter-table-body');
+
+    const data = requestData(form.id + '.csv');
+    data.split('\n').forEach(row => {
         const rowElement = document.createElement('TR');
         rowElement.setAttribute('class', 'filter-table-row');
 
-        row.forEach(col => {
+        row.split(';').forEach(col => {
             const columnElement = document.createElement('TD');
             columnElement.setAttribute('class', 'filter-table-column');
 
@@ -34,18 +37,30 @@ function renderFilterTable(formData, form) {
             rowElement.appendChild(columnElement);
         });
 
-        tableElement.appendChild(rowElement);
+        tableBody.appendChild(rowElement);
     });
+
+    tableElement.appendChild(tableBody);
 
     render(tableElement, contentWrapper);
 }
 
 filterOption.addEventListener('click', () => {
-    currentActionElement.classList.remove('option-selected');
-    filterOption.classList.add('option-selected');
+    const from = currentAction;
+    const to = Actions.FILTER;
 
-    currentActionElement = filterOption;
-    currentAction = Actions.FILTER;
+    if (currentAction !== Actions.FILTER) {
+        currentActionElement.classList.remove('option-selected');
+        filterOption.classList.add('option-selected');
+
+        currentActionElement = filterOption;
+        currentAction = Actions.FILTER;
+
+        let prevOpPos = optionPosition;
+        optionPosition = filterOption.getBoundingClientRect().top;
+
+        moveOptionSelector(from, to, prevOpPos);
+    }
 }, false);
 
 

@@ -1,6 +1,7 @@
 #sidebar {
     height: 100%;
     width: 65px;
+    min-width: 65px;
     background: #0A0A0A;
     display: flex;
     flex-direction: column;
@@ -9,6 +10,18 @@
     padding: 0;
     padding-top: 10px;
     float: left;
+}
+
+#sidebar-options {
+    height: 100%;
+    width: 65px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    z-index: 1 !important;
 }
 
 .sidebar-button {
@@ -32,4 +45,18 @@
     position: fixed;
     -webkit-app-region: drag;
     border-bottom: solid 1px rgba(255, 255, 255, 0.26);
+}
+
+.option-selected {
+    transition-duration: .3s;
+    color: #0A0A0A;
+}
+
+#option-selector {
+    width: 33px;
+    height: 28px;
+    position: absolute;
+    background: #C0B283;
+    border-radius: 5px;
+    z-index: 0 !important;
 }
