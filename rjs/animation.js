@@ -1,12 +1,21 @@
-function moveOptionSelector(from, to, optionPosition) {
+function moveOptionSelector(from, to, prevOpPos) {
+    virtualPath.pop();
+    update(true);
+
+    if (isFirst) {
+        optionSelector.style.top = optionPosition + 'px';
+        isFirst = false;
+        return;
+    }
+
     const indexIncrement = to - from;
-    const frames = 35;
+    const frames = 25;
     const animationTime = 1;
 
     const targetOffset = buttonMargin * indexIncrement;
     const pxIncrement = targetOffset / frames;
 
-    let selectorPosition = optionPosition;
+    let selectorPosition = prevOpPos;
     const targetPosition = selectorPosition + targetOffset;
 
     let move = () => {

@@ -1,51 +1,5 @@
 const mutateOption = document.querySelector('#edit-contract');
 
-function createList() {
-    pathData.forEach(file => {
-        const type = file.type;
-        const name = file.name;
-        const id = file.id;
-
-        if (type !== 'form' && type !== 'directory') {
-            console.log('Invalid JSON');
-            process.exit();
-        }
-
-        const nameText = document.createTextNode(name);
-
-        const listItem = document.createElement('LI');
-        listItem.setAttribute('class', 'directory');
-        listItem.setAttribute('id', id);
-        listItem.appendChild(nameText);
-
-        directoryList.appendChild(listItem);
-    });
-
-    directoryList.childNodes.forEach(node => {
-        node.addEventListener('click', e => {
-            virtualPath.push(node.innerText);
-
-            const id = e.target.id;
-            const fileObject = pathData.find(file => file.id === id);
-
-            if (fileObject.type === 'directory') {
-                pathData = fileObject.content;
-                update(true);
-            } else {
-                let data = [];
-                if (fileObject.location === 'remote') {
-                    data = JSON.parse(fs.readFileSync('forms/' + fileObject.path));
-
-                } else {
-                    data = fileObject.form;
-                }
-                update(false);
-                renderForm(data);
-            }
-        }, false);
-    });
-}
-
 function addInputClass(className, index, input) {
     input
         .parentNode
@@ -164,19 +118,5 @@ function renderForm(data) {
 }
 
 mutateOption.addEventListener('click', () => {
-    const from = currentAction;
-    const to = Actions.MUTATE;
-
-    if (currentAction !== Actions.MUTATE) {
-        currentActionElement.classList.remove('option-selected');
-        mutateOption.classList.add('option-selected');
-
-        currentActionElement = mutateOption;
-        currentAction = Actions.MUTATE;
-
-        let prevOpPos = optionPosition;
-        optionPosition = mutateOption.getBoundingClientRect().top;
-
-        moveOptionSelector(from, to, prevOpPos);
-    }
+    updateToolbarOption(mutateOption, Actions.MUTATE);
 }, false);

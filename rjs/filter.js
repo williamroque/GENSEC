@@ -45,22 +45,9 @@ function renderFilterTable(form, formData) {
     render(tableElement, contentWrapper);
 }
 
+const filterOption = document.querySelector('#filter');
 filterOption.addEventListener('click', () => {
-    const from = currentAction;
-    const to = Actions.FILTER;
-
-    if (currentAction !== Actions.FILTER) {
-        currentActionElement.classList.remove('option-selected');
-        filterOption.classList.add('option-selected');
-
-        currentActionElement = filterOption;
-        currentAction = Actions.FILTER;
-
-        let prevOpPos = optionPosition;
-        optionPosition = filterOption.getBoundingClientRect().top;
-
-        moveOptionSelector(from, to, prevOpPos);
-    }
+    updateToolbarOption(filterOption, Actions.FILTER);
 }, false);
 
 

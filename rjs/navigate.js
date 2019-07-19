@@ -34,7 +34,6 @@ function createList() {
                     let formData = [];
                     if (fileObject.location === 'remote') {
                         formData = JSON.parse(fs.readFileSync('forms/' + fileObject.path));
-
                     } else {
                         formData = fileObject.form;
                     }
@@ -63,43 +62,60 @@ function update(removesContent) {
    [''].concat(virtualPath).forEach(file => {
        const wrapperElem = document.createElement('SPAN');
 
-        const directoryElem = document.createElement('SPAN');
-        const directoryElemText = document.createTextNode(file);
+       const directoryElem = document.createElement('SPAN');
+       const directoryElemText = document.createTextNode(file);
 
-        directoryElem.setAttribute('class', 'dir-label');
+       directoryElem.setAttribute('class', 'dir-label');
 
-        // Change to span path on click
-        wrapperElem.addEventListener('click', e => {
-            let text = e.target.innerText;
-            // Remove directory slash from end of text
-            text = text.slice(0, text.length - 1 || 1);
+       // Change to span path on click
+       wrapperElem.addEventListener('click', e => {
+           let text = e.target.innerText;
+           text = text.slice(0, text.length - 1 || 1);
 
-            // Handle home directory
-            if (text === '/') {
-                virtualPath = [];
-                update(true);
-                return;
-            }
+           // Handle home directory
+           if (text === '/') {
+               virtualPath = [];
+               pathData = indexData;
+               update(true);
+               return;
+           }
 
-            // Cut current path to clicked directory
-            virtualPath = virtualPath.slice(0, virtualPath.indexOf(text));
+           // Cut current path to clicked directory
+           virtualPath = virtualPath.slice(0, virtualPath.indexOf(text));
 
-            update(true);
-        }, false);
+           update(true);
+       }, false);
 
-        directoryElem.appendChild(directoryElemText);
+       directoryElem.appendChild(directoryElemText);
 
-        const slashElem = document.createElement('SPAN');
-        slashElem.setAttribute('class', 'dir-slash');
-        const slashText = document.createTextNode('/');
-        slashElem.appendChild(slashText);
+       const slashElem = document.createElement('SPAN');
+       slashElem.setAttribute('class', 'dir-slash');
+       const slashText = document.createTextNode('/');
+       slashElem.appendChild(slashText);
 
-        wrapperElem.appendChild(directoryElem);
-        wrapperElem.appendChild(slashElem);
+       wrapperElem.appendChild(directoryElem);
+       wrapperElem.appendChild(slashElem);
 
-        navigationBar.appendChild(wrapperElem);
-    });
+       navigationBar.appendChild(wrapperElem);
+   });
 }
 
-// Start content display
-update(true);
+function updateToolbarOption(optionElement, optionAction) {
+    const from = currentAction;
+    const to = optionAction;
+
+    if (currentAction !== optionAction) {
+        if (currentActionElement) {
+            currentActionElement.classList.remove('option-selected');
+        }
+        optionElement.classList.add('option-selected');
+
+        let prevOpPos = optionPosition;
+        optionPosition = optionElement.getBoundingClientRect().top;
+
+        currentActionElement = optionElement;
+        currentAction = optionAction;
+
+        moveOptionSelector(from, to, prevOpPos);
+    }
+}
