@@ -85,7 +85,15 @@
         [
             {
                 "type": "submit",
-                "value": "SALVAR"
+                "value": "SALVAR",
+                "checkSuite": {
+                    "Fun\u00E7\u00E3o": "^[\\w|\\s]{1,150}$",
+                    "Rua": "^[\\w|\\s]{1,150}$",
+                    "Cidade": "^[\\w|\\s]{1,150}$",
+                    "Estado": "^[a-zA-Z]{2}$",
+                    "Pa\u00EDs": "^[\\w|\\s]{1,50}$",
+                    "CEP": "^\\d{5}-\\d{3}|\\d{8}$"
+                }
             }
         ]
     ]

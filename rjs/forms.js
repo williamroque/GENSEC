@@ -93,8 +93,28 @@ function renderForm(data, fileId) {
 
             if (col.type === 'submit') {
                 click = (dom, e) => {
-                    const data = Object.keys(dom).map(key => dom[key].value);
-                    const returnCode = requestAddRow(data.slice(0, data.length - 1).join(';') + '|' + fileId);
+                    let data = {};
+                    let dataCols = [];
+
+                    Object.keys(dom).forEach(key => {
+                        const value = dom[key].value;
+                        data[key] = value;
+                        dataCols.push(value);
+                    });
+
+                    if (col.checkSuite) {
+                        const firstInvalid = Object.keys(data).find(key => {
+                            const pattern = new RegExp(col.checkSuite[key]);
+                            return !pattern.test(data[key]);
+                        });
+
+                        if (firstInvalid) {
+                            showMessagePrompt('Invalid input for <b><i>' + firstInvalid + '</i></b> .', 2500);
+                            return;
+                        }
+                    }
+
+                    const returnCode = requestAddRow(dataCols.slice(0, dataCols.length - 1).join(';') + '|' + fileId);
 
                     switch (returnCode) {
                         case 'write_failed':

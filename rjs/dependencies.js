@@ -79,8 +79,7 @@ function toggleOpacity(elem, callback, dt=7) {
 }
 
 function showMessagePrompt(message, t=2000) {
-    const messageText = document.createTextNode(message);
-    messagePrompt.appendChild(messageText);
+    messagePrompt.innerHTML = message;
     toggleOpacity(messagePrompt);
 
     setTimeout(() => {
