@@ -42,7 +42,7 @@ function createList() {
                     if (currentAction === Actions.FILTER) {
                         renderFilterTable(fileObject, formData);
                     } else if (currentAction === Actions.MUTATE) {
-                        renderForm(formData);
+                        renderForm(formData, fileObject.id);
                     }
                 }
             }

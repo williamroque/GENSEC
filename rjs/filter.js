@@ -22,7 +22,7 @@ function renderFilterTable(form, formData) {
     const tableBody = document.createElement('TBODY');
     tableBody.setAttribute('class', 'filter-table-body');
 
-    const data = requestData(form.id + '.csv');
+    const data = requestData(form.id);
     data.split('\n').forEach(row => {
         const rowElement = document.createElement('TR');
         rowElement.setAttribute('class', 'filter-table-row');

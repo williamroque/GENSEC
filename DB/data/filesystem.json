@@ -1,8 +1,5 @@
 {
-    "filesystem": [
-        {
-            "path": "integrantes.csv",
-            "id": "integrantes"
-        }
-    ]
+    "filesystem": {
+        "integrantes-operacao": "integrante.csv"
+    }
 }

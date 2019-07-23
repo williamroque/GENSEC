@@ -36,5 +36,3 @@ app.on('activate', () => {
         mainWin = createWindow();
     }
 });
-
-console.log(data);

@@ -5,16 +5,17 @@ const {
 } = require('electron');
 
 ipcMain.on('request-data', getData);
+ipcMain.on('request-add-row', addRow);
 
 const net = require('net');
 
 const ip = '192.168.25.15';
 const port = 5000;
 
-function getData(event, path) {
+function createServer(request, event) {
     const client = net.createConnection({ port: 5000, host: 'localhost' }, () => {
         console.log('Initialized socket.');
-        client.write('request_data\n' + path);
+        client.write(request);
     });
 
     client.on('error', () => {
@@ -27,7 +28,7 @@ function getData(event, path) {
         client.end();
     });
 
-    client.setTimeout(20000);
+    client.setTimeout(5000);
     client.on('timeout', () => {
         console.log('Connection timed out.');
         app.quit();
@@ -54,4 +55,12 @@ function getData(event, path) {
     client.on('end', () => {
         console.log('Disconnected from server.');
     });
+}
+
+function getData(event, path) {
+    createServer('request_data\n' + path, event);
+}
+
+function addRow(event, rowData) {
+    createServer('add\n' + rowData, event);
 }

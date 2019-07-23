@@ -17,6 +17,7 @@ function removeInputClass(className, index, input) {
 }
 
 function refreshState(input) {
+    console.log(input.tagName.toLowerCase(), input.value);
     if (input.tagName.toLowerCase() === 'input' && input.type === 'text') {
         if (input.value !== '') {
             addInputClass('form-text-input-label-active', 0, input);
@@ -36,7 +37,7 @@ function refreshState(input) {
     }
 }
 
-function renderForm(data) {
+function renderForm(data, fileId) {
     const formTable = document.createElement('DIV');
     formTable.setAttribute('class', 'form-table');
 
@@ -89,6 +90,24 @@ function renderForm(data) {
             let click = () => {};
             let change = (_, e) => refreshState(e.target);
             let keydown = () => {};
+
+            if (col.type === 'submit') {
+                click = (dom, e) => {
+                    const data = Object.keys(dom).map(key => dom[key].value);
+                    const returnCode = requestAddRow(data.slice(0, data.length - 1).join(';') + '|' + fileId);
+
+                    switch (returnCode) {
+                        case 'write_failed':
+                            showMessagePrompt('Failed to write data.', 2500);
+                            break;
+                        case 'write_successful':
+                            showMessagePrompt('Successfully wrote data.', 1600);
+                            break;
+                        default:
+                            console.log('Invalid submit return code.');
+                    }
+                };
+            }
 
             if (col.script) {
                 eval(col.script.join('\n'));

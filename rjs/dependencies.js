@@ -8,6 +8,8 @@ const indexData = JSON.parse(fs.readFileSync(index)).filesystem;
 const navigationBar = document.querySelector('#navigate');
 const contentWrapper = document.querySelector('#main-content');
 
+const messagePrompt = document.querySelector('#message-prompt');
+
 let virtualPath = [];
 
 let dataBody;
@@ -56,3 +58,34 @@ function parseData(data) {
     return rows.map(row => row.split(';'));
 }
 
+function toggleOpacity(elem, callback, dt=7) {
+    let opacity = Math.ceil(elem.style.opacity);
+    const increment = 1 - opacity * 2;
+
+    let step = callback => {
+        if (opacity > 1 || opacity < 0) {
+            elem.style.opacity = Math.round(Math.abs(opacity));
+            if (callback) {
+                callback();
+            }
+        } else {
+            opacity = parseFloat((((opacity * 10 | 0) + increment) / 10).toFixed(1));
+            elem.style.opacity = opacity;
+            setTimeout(step, dt, callback);
+        }
+    };
+
+    step(callback);
+}
+
+function showMessagePrompt(message, t=2000) {
+    const messageText = document.createTextNode(message);
+    messagePrompt.appendChild(messageText);
+    toggleOpacity(messagePrompt);
+
+    setTimeout(() => {
+        toggleOpacity(messagePrompt, () => {
+            clearNode(messagePrompt);
+        });
+    }, t);
+}
