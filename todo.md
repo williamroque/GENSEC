@@ -1,10 +1,9 @@
 # Todo
 
 * Database
-    * Allow user to edit or delete any contract
-    * Fix navigation bugs
-    * Server-side empty string handling
     * Add connection interface
+* Make contracts searchable
+* Create other test forms
 * Generate contracts
 * Derive libraries from project
     * Derive library for Python/Electron (NodeJS) interactions
