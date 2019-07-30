@@ -1,13 +1,15 @@
 #main {
     margin: 0;
     padding: 0;
-    flex-grow: 1;
     height: 100%;
+    width: 500px;
+    flex-grow: 1;
     float: right;
     display: flex;
     align-items: center;
     flex-direction: column;
     padding-top: 60px;
+    opacity: 1;
 }
 
 #main-header {
@@ -157,7 +159,6 @@ label {
     color: #333;
     font-size: 10pt;
     transition-duration: .1s;
-    z-index: -1;
 }
 
 .form-col:focus-within .form-text-input-label,

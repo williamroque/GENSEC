@@ -1,6 +1,11 @@
-const { app, dialog } = require('electron');
+const {
+    app,
+    dialog,
+    BrowserWindow
+} = require('electron');
 
-const Window = require('./window');
+const path = require('path');
+const url = require('url');
 
 const data = require('./db');
 
@@ -14,6 +19,7 @@ const mainWinObject = {
     maxWidth: 1150,
     maxHeight: 770,
     fullscreen: false,
+    backgroundColor: '#0A0A0A',
     webPreferences: {
         nodeIntegration: true
     }
@@ -21,7 +27,17 @@ const mainWinObject = {
 
 let mainWin;
 
-const createWindow = () => mainWin = new Window(mainWinObject);
+const createWindow = () => {
+    mainWin = new BrowserWindow(mainWinObject);
+
+    mainWin.loadURL(url.format({
+        pathname: path.join(__dirname, '../html/index.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+
+    mainWin.on('closed', e => mainWin = null);
+};
 
 app.on('ready', createWindow);
 

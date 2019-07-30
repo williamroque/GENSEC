@@ -10,13 +10,20 @@
     <link rel="stylesheet" href="../css/prompt.css">
 </head>
 <body>
+    <div id="overlay">
+        <img id="logo" src="../assets/images/logos-sec.png">
+    </div>
     <div id="titlebar"></div>
+    <div id="sidebar-spacer">&nbsp;</div>
     <div id="sidebar">
         <div id="option-selector"></div>
         <div id="sidebar-options">
-            <button class="icon sidebar-button" id="filter">filter_list</button>
-            <button class="icon sidebar-button" id="edit-contract">edit</button>
-            <button class="icon sidebar-button" id="generate-contract">build</button>
+            <div id="upper">
+                <button class="icon sidebar-button" id="filter">filter_list</button>
+                <button class="icon sidebar-button" id="edit-contract">edit</button>
+                <button class="icon sidebar-button" id="generate-contract">build</button>
+            </div>
+            <button class="icon sidebar-button" id="settings">settings</button>
         </div>
     </div>
     <div id="main">
@@ -39,5 +46,7 @@
     <script src="../rjs/animation.js"></script>
     <script src="../rjs/forms.js"></script>
     <script src="../rjs/filter.js"></script>
+    <script src="../rjs/settings.js"></script>
+    <script src="../rjs/splash.js"></script>
 </body>
 </html>
