@@ -25,25 +25,13 @@ function createList() {
                 virtualPath.push(node.innerText);
 
                 const id = e.target.id;
-                const fileObject = pathData.find(file => file.id === id);
+                const fileObject = getFileObject(id);
 
                 if (fileObject.type === 'directory') {
                     pathData = fileObject.content;
                     update(true);
                 } else {
-                    let formData = [];
-                    if (fileObject.location === 'remote') {
-                        formData = JSON.parse(fs.readFileSync('forms/' + fileObject.path));
-                    } else {
-                        formData = fileObject.form;
-                    }
-
-                    update(false);
-                    if (currentAction === Actions.FILTER) {
-                        renderFilterTable(fileObject, formData);
-                    } else if (currentAction === Actions.MUTATE) {
-                        renderForm(formData, fileObject.id);
-                    }
+                    renderObject(id, fileObject);
                 }
             }
         }, false);
@@ -59,48 +47,49 @@ function update(removesContent) {
 
     clearNode(navigationBar);
 
-   [''].concat(virtualPath).forEach(file => {
-       const wrapperElem = document.createElement('SPAN');
+    [''].concat(virtualPath).forEach(file => {
+        const wrapperElem = document.createElement('SPAN');
 
-       const directoryElem = document.createElement('SPAN');
-       const directoryElemText = document.createTextNode(file);
+        const directoryElem = document.createElement('SPAN');
+        const directoryElemText = document.createTextNode(file);
 
-       directoryElem.setAttribute('class', 'dir-label');
+        directoryElem.setAttribute('class', 'dir-label');
 
-       // Change to span path on click
-       wrapperElem.addEventListener('click', e => {
-           let text = e.target.innerText;
-           text = text.slice(0, text.length - 1 || 1);
+        // Change to span path on click
+        wrapperElem.addEventListener('click', e => {
+            let pathElem = e.currentTarget;
 
-           // Handle home directory
-           if (text === '/') {
-               virtualPath = [];
-               pathData = indexData;
-               update(true);
-               return;
-           }
+            // Handle home directory
+            if (pathElem.textContent === '/') {
+                virtualPath = [];
+                pathData = indexData;
+                update(true);
+                return;
+            }
 
-           // Cut current path to clicked directory
-           virtualPath = virtualPath.slice(0, virtualPath.indexOf(text));
+            // Cut current path to clicked directory
+            let i = 0;
+            while (pathElem = pathElem.previousSibling) i++;
+            virtualPath = virtualPath.slice(0, i);
 
-           update(true);
-       }, false);
+            update(true);
+        }, false);
 
-       directoryElem.appendChild(directoryElemText);
+        directoryElem.appendChild(directoryElemText);
 
-       const slashElem = document.createElement('SPAN');
-       slashElem.setAttribute('class', 'dir-slash');
-       const slashText = document.createTextNode('/');
-       slashElem.appendChild(slashText);
+        const slashElem = document.createElement('SPAN');
+        slashElem.setAttribute('class', 'dir-slash');
+        const slashText = document.createTextNode('/');
+        slashElem.appendChild(slashText);
 
-       wrapperElem.appendChild(directoryElem);
-       wrapperElem.appendChild(slashElem);
+        wrapperElem.appendChild(directoryElem);
+        wrapperElem.appendChild(slashElem);
 
-       navigationBar.appendChild(wrapperElem);
-   });
+        navigationBar.appendChild(wrapperElem);
+    });
 }
 
-function updateToolbarOption(optionElement, optionAction) {
+function updateToolbarOption(optionElement, optionAction, isDirect=false) {
     const from = currentAction;
     const to = optionAction;
 
@@ -116,6 +105,6 @@ function updateToolbarOption(optionElement, optionAction) {
         currentActionElement = optionElement;
         currentAction = optionAction;
 
-        moveOptionSelector(from, to, prevOpPos);
+        moveOptionSelector(from, to, prevOpPos, isDirect);
     }
 }

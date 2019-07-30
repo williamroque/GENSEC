@@ -1,6 +1,13 @@
-function moveOptionSelector(from, to, prevOpPos) {
-    virtualPath.pop();
-    update(true);
+function moveOptionSelector(from, to, prevOpPos, isDirect) {
+    if (!isDirect) {
+        if (isForm) {
+            virtualPath.pop();
+            isForm = false;
+        }
+        update(true);
+    } else {
+        update(false); 
+    }
 
     if (isFirst) {
         optionSelector.style.top = optionPosition + 'px';

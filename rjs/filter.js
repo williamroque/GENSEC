@@ -1,3 +1,66 @@
+let promptVisible = false;
+
+function hideMutatePrompt() {
+    if (promptVisible) {
+        mutatePrompt.style.top = '-500px';
+        mutatePrompt.style.left = '-500px';
+    }
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        hideMutatePrompt();
+    }
+}, false);
+
+document.addEventListener('click', hideMutatePrompt, false);
+
+let currentPromptHandlers;
+
+function handleRowClick(e) {
+    e.stopPropagation();
+
+    const promptHeight = mutatePrompt.offsetHeight;
+    const promptWidth = mutatePrompt.offsetWidth;
+
+    mutatePrompt.style.top = (
+        e.pageY + promptHeight + 10 >= window.innerHeight ?
+        e.pageY - promptHeight :
+        e.pageY
+    ) + 'px';
+
+    mutatePrompt.style.left = (
+        e.pageX + promptWidth + 10 >= window.innerWidth ?
+        e.pageX - promptWidth :
+        e.pageX
+    ) + 'px';
+
+    formIndex = e.currentTarget.getAttribute('data-index') | 0;
+
+    if (currentPromptHandlers) {
+        editButton.removeEventListener('click', currentPromptHandlers[0], false);
+        deleteButton.removeEventListener('click', currentPromptHandlers[1], false);
+    }
+
+    const editHandler = () => {
+        const data = [...this.childNodes].map(col => col.textContent);
+        editRow(data);
+    };
+
+    const deleteHandler = () => {
+        indexShifts.add(formIndex);
+        handleWriteCode(requestDeleteRow(getRelativeIndex(formIndex), currentForm.id));
+        this.remove();
+    };
+
+    editButton.addEventListener('click', editHandler, false);
+    deleteButton.addEventListener('click', deleteHandler, false);
+
+    currentPromptHandlers = [editHandler, deleteHandler];
+
+    promptVisible = true;
+}
+
 function renderFilterTable(form, formData) {
     const tableElement = document.createElement('TABLE');
     tableElement.setAttribute('class', 'filter-table');
@@ -23,9 +86,12 @@ function renderFilterTable(form, formData) {
     tableBody.setAttribute('class', 'filter-table-body');
 
     const data = requestData(form.id);
-    data.split('\n').forEach(row => {
+    data.split('\n').forEach((row, i) => {
         const rowElement = document.createElement('TR');
         rowElement.setAttribute('class', 'filter-table-row');
+        rowElement.setAttribute('data-index', i);
+
+        rowElement.addEventListener('click', handleRowClick, false);
 
         row.split(';').forEach(col => {
             const columnElement = document.createElement('TD');

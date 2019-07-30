@@ -17,7 +17,6 @@ function removeInputClass(className, index, input) {
 }
 
 function refreshState(input) {
-    console.log(input.tagName.toLowerCase(), input.value);
     if (input.tagName.toLowerCase() === 'input' && input.type === 'text') {
         if (input.value !== '') {
             addInputClass('form-text-input-label-active', 0, input);
@@ -37,7 +36,7 @@ function refreshState(input) {
     }
 }
 
-function renderForm(data, fileId) {
+function renderForm(data, fileID) {
     const formTable = document.createElement('DIV');
     formTable.setAttribute('class', 'form-table');
 
@@ -104,7 +103,7 @@ function renderForm(data, fileId) {
 
                     if (col.checkSuite) {
                         const firstInvalid = Object.keys(data).find(key => {
-                            const pattern = new RegExp(col.checkSuite[key]);
+                            const pattern = new RegExp(col.checkSuite[key] || '^[A-Za-zÀ-ÖØ-öø-ÿ|\\s]*$');
                             return !pattern.test(data[key]);
                         });
 
@@ -114,18 +113,18 @@ function renderForm(data, fileId) {
                         }
                     }
 
-                    const returnCode = requestAddRow(dataCols.slice(0, dataCols.length - 1).join(';') + '|' + fileId);
+                    let returnCode;
 
-                    switch (returnCode) {
-                        case 'write_failed':
-                            showMessagePrompt('Failed to write data.', 2500);
-                            break;
-                        case 'write_successful':
-                            showMessagePrompt('Successfully wrote data.', 1600);
-                            break;
-                        default:
-                            console.log('Invalid submit return code.');
+                    let dataRow = dataCols.slice(0, dataCols.length - 1).join(';');
+                    if (!isUpdate) {
+                        returnCode = requestAddRow(dataRow, fileID);
+                    } else {
+                        if (formIndex !== undefined) {
+                            returnCode = requestUpdateRow(getRelativeIndex(formIndex), dataRow, fileID);
+                        }
                     }
+
+                    handleWriteCode(returnCode);
                 };
             }
 
@@ -156,6 +155,23 @@ function renderForm(data, fileId) {
     render(formTable, contentWrapper);
 }
 
+function editRow(rowData) {
+    if (Object.keys(currentForm).length) {
+        isUpdate = true;
+        updateToolbarOption(mutateOption, Actions.MUTATE, true);
+        renderObject(pathData.id, currentForm, Actions.MUTATE);
+
+        const domElements = Object.values(dom);
+        domElements.slice(0, domElements.length - 1).forEach((elem, i) => {
+            if (rowData[i]) {
+                elem.value = rowData[i];
+                refreshState(elem);
+            }
+        });
+    }
+}
+
 mutateOption.addEventListener('click', () => {
+    isUpdate = false;
     updateToolbarOption(mutateOption, Actions.MUTATE);
 }, false);

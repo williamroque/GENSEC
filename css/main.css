@@ -219,9 +219,14 @@ tbody {
     letter-spacing: .03em;
 }
 
-tbody tr {
+.filter-table-row {
     display: table;
     table-layout: fixed;
     width: 100%;
     margin-bottom: 3px;
+    cursor: pointer;
+}
+
+* {
+    user-select: none;
 }
