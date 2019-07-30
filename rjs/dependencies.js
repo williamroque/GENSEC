@@ -74,11 +74,8 @@ function parseData(data) {
 
 const getFileObject = id => pathData.find(file => file.id === id);
 
-let animationLock = false;
-
-function toggleOpacity(elem, callback, dt=7) {
+function toggleOpacity(increment, elem, callback, dt=7) {
     let opacity = Math.ceil(elem.style.opacity);
-    const increment = 1 - opacity * 2;
 
     let step = callback => {
         if (opacity > 1 || opacity < 0) {
@@ -86,7 +83,6 @@ function toggleOpacity(elem, callback, dt=7) {
             if (callback) {
                 callback();
             }
-            animationLock = false;
         } else {
             opacity = parseFloat((((opacity * 10 | 0) + increment) / 10).toFixed(1));
             elem.style.opacity = opacity;
@@ -94,21 +90,28 @@ function toggleOpacity(elem, callback, dt=7) {
         }
     };
 
-    if (!animationLock) {
-        animationLock = true;
-        step(callback);
-    }
+    step(callback);
 }
 
+function setToggleTimeout(t) {
+    return setTimeout(() => {
+        toggleOpacity(-1, messagePrompt);
+        mPromptVisible = false;
+    }, t);
+}
+
+let mPromptVisible = false;
+let currentTimeout;
 function showMessagePrompt(message, t=2000) {
     messagePrompt.innerHTML = message;
-    toggleOpacity(messagePrompt, () => {
-        setTimeout(() => {
-            toggleOpacity(messagePrompt, () => {
-                //clearNode(messagePrompt);
-            });
-        }, t);
-    });
+
+    if (!mPromptVisible) {
+        mPromptVisible = true;
+        toggleOpacity(1, messagePrompt);
+    } else {
+        clearTimeout(currentTimeout);
+    }
+    currentTimeout = setToggleTimeout(t);
 }
 
 function renderObject(id, fileObject, actionOverride) {
@@ -145,9 +148,17 @@ function handleWriteCode(code) {
         case 'write_successful':
             showMessagePrompt('Successfully wrote data.', 1600);
             break;
+        case 'network_error':
+            showMessagePrompt('Unable to connect to server.', 2500);
+            break;
+        case 'network_timeout':
+            showMessagePrompt('Connection timed out.', 2500);
+            break;
         default:
             console.log('Invalid submit return code.');
+            return false;
     }
+    return true;
 }
 
 const getRelativeIndex = i => [...indexShifts].reduce((a, b) => i > b ? a - 1 : a, i);

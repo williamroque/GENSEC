@@ -1,8 +1,4 @@
-const { 
-    app,
-    dialog,
-    ipcMain
-} = require('electron');
+const { app, ipcMain } = require('electron');
 
 ipcMain.on('request-data', getData);
 ipcMain.on('request-add-row', addRow);
@@ -21,15 +17,14 @@ function createServer(request, event) {
     });
 
     client.on('error', err => {
-        dialog.showMessageBox({
-            message: 'Unable to connect to the server.'
-        }, () => {});
+        event.returnValue = 'network_error';
 
         client.end();
     });
 
     client.setTimeout(5000);
     client.on('timeout', () => {
+        event.returnValue = 'network_timeout';
         client.end();
     });
 

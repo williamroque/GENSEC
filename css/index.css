@@ -50,6 +50,8 @@ html, body {
     left: 50%;
     transform: translate(-50%, -50%);
     animation: fadeIn .2s ease forwards;
+    transform-origin: center;
+    width: 230px;
 }
 
 .overlay-hidden {
