@@ -4,14 +4,20 @@ ipcMain.on('request-data', getData);
 ipcMain.on('request-add-row', addRow);
 ipcMain.on('request-delete-row', deleteRow);
 ipcMain.on('request-update-row', updateRow);
+ipcMain.on('request-read-settings', readSettings);
+ipcMain.on('request-write-settings', writeSettings);
 
 const net = require('net');
 
-const ip = '192.168.25.15';
-const port = 5000;
+const appdata = require('./appdata');
+
+let settings = appdata.readConfig();
 
 function createServer(request, event) {
-    const client = net.createConnection({ port: 5000, host: 'localhost' }, () => {
+    const client = net.createConnection({
+        port: settings.port,
+        host: settings.ip
+    }, () => {
         console.log('Initialized socket.');
         client.write(request);
     });
@@ -64,4 +70,16 @@ function deleteRow(event, rowIndex, fileID) {
 
 function updateRow(event, rowIndex, rowData, fileID) {
     createServer('update\n' + rowIndex + '%' + rowData + '|' + fileID, event);
+}
+
+function readSettings(event) {
+    event.returnValue = settings;
+}
+
+function writeSettings(event, newSettings) {
+    Object.keys(newSettings).forEach(setting => {
+        settings[setting] = newSettings[setting];
+    });
+
+    event.returnValue = appdata.writeConfig(settings);
 }

@@ -61,41 +61,57 @@ function handleRowClick(e) {
     promptVisible = true;
 }
 
-function renderFilterTable(form, formData) {
-    const data = requestData(form.id);
+function renderFilterTable(form, formData, filter) {
+    let data;
 
-    if (!handleWriteCode(data)) {
-        const tableElement = document.createElement('TABLE');
-        tableElement.setAttribute('class', 'filter-table');
+    if (filter) {
+        data = dataFull;
+    } else {
+        data = requestData(form.id);
+        if (!handleWriteCode(data)) {
+            data = data.split('\n').map(row => row.split(';'));
+        } else {
+            virtualPath.pop();
+            isForm = false;
+            update(false);
+            return;
+        }
+        dataFull = data;
+        filter = () => true;
+    }
 
-        const headerRowElement = document.createElement('TR');
-        headerRowElement.setAttribute('class', 'filter-table-header-row');
+    const tableElement = document.createElement('TABLE');
+    tableElement.setAttribute('class', 'filter-table');
 
-        const headers = formData.form.flat().filter(input => input.type === 'text' || input.type === 'textarea').map(input => input.label);
+    const headerRowElement = document.createElement('TR');
+    headerRowElement.setAttribute('class', 'filter-table-header-row');
 
-        headers.forEach(header => {
-            const headerElement = document.createElement('TH');
-            headerElement.setAttribute('class', 'filter-table-header-column');
+    const headers = formData.form.flat().filter(input => input.type === 'text' || input.type === 'textarea').map(input => input.label);
 
-            const headerText = document.createTextNode(header);
-            headerElement.appendChild(headerText);
+    headers.forEach(header => {
+        const headerElement = document.createElement('TH');
+        headerElement.setAttribute('class', 'filter-table-header-column');
 
-            headerRowElement.appendChild(headerElement);
-        });
+        const headerText = document.createTextNode(header);
+        headerElement.appendChild(headerText);
 
-        tableElement.appendChild(headerRowElement);
+        headerRowElement.appendChild(headerElement);
+    });
 
-        const tableBody = document.createElement('TBODY');
-        tableBody.setAttribute('class', 'filter-table-body');
+    tableElement.appendChild(headerRowElement);
 
-        data.split('\n').forEach((row, i) => {
+    const tableBody = document.createElement('TBODY');
+    tableBody.setAttribute('class', 'filter-table-body');
+
+    data.forEach((row, i) => {
+        if (filter(row)) {
             const rowElement = document.createElement('TR');
             rowElement.setAttribute('class', 'filter-table-row');
             rowElement.setAttribute('data-index', i);
 
             rowElement.addEventListener('click', handleRowClick, false);
 
-            row.split(';').forEach(col => {
+            row.forEach(col => {
                 const columnElement = document.createElement('TD');
                 columnElement.setAttribute('class', 'filter-table-column');
 
@@ -106,16 +122,12 @@ function renderFilterTable(form, formData) {
             });
 
             tableBody.appendChild(rowElement);
-        });
+        }
+    });
 
-        tableElement.appendChild(tableBody);
+    tableElement.appendChild(tableBody);
 
-        render(tableElement, contentWrapper);
-    } else {
-        virtualPath.pop();
-        isForm = false;
-        update(false);
-    }
+    render(tableElement, contentWrapper);
 }
 
 const filterOption = document.querySelector('#filter');

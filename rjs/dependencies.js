@@ -14,6 +14,8 @@ const mutatePrompt = document.querySelector('#mutate-prompt');
 const editButton = document.querySelector('#edit-button');
 const deleteButton = document.querySelector('#delete-button');
 
+const searchButton = document.querySelector('#search-button');
+
 let isUpdate = false;
 
 let virtualPath = [];
@@ -21,7 +23,7 @@ let currentForm;
 
 let dataBody;
 
-let isFirst = true;
+let dataFull = null;
 
 let isForm = false;
 
@@ -132,11 +134,14 @@ function renderObject(id, fileObject, actionOverride) {
     let action = actionOverride ? actionOverride : currentAction;
 
     if (action === Actions.FILTER) {
+        searchButton.classList.add('search-button-enabled');
+        requestUpdateSearchEnabled(true);
         renderFilterTable(fileObject, formData);
     } else if (action === Actions.MUTATE) {
         renderForm(formData, fileObject.id);
     }
 
+    dataBody = formData;
     return formData;
 }
 

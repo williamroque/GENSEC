@@ -1,3 +1,5 @@
+let isFirst = true;
+
 function moveOptionSelector(from, to, prevOpPos, isDirect) {
     if (!isDirect) {
         if (isForm) {

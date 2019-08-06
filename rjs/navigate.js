@@ -45,6 +45,12 @@ function update(removesContent) {
         render(directoryList, contentWrapper);
     }
 
+    if (currentAction !== Actions.FILTER || !isForm) {
+        searchButton.classList.remove('search-button-enabled');
+        requestUpdateSearchEnabled(false);
+        dataFull = null;
+    }
+
     clearNode(navigationBar);
 
     [''].concat(virtualPath).forEach(file => {
@@ -69,10 +75,13 @@ function update(removesContent) {
 
             // Cut current path to clicked directory
             let i = 0;
-            while (pathElem = pathElem.previousSibling) i++;
-            virtualPath = virtualPath.slice(0, i);
+            while (pathElem = pathElem.previousSibling) ++i;
 
-            update(true);
+            if (i < virtualPath.length) {
+                virtualPath = virtualPath.slice(0, i);
+                isForm = false;
+                update(true);
+            }
         }, false);
 
         directoryElem.appendChild(directoryElemText);

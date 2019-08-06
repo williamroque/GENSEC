@@ -1,7 +1,12 @@
+const ISDEVDIST = true;
+
 const {
     app,
     dialog,
-    BrowserWindow
+    BrowserWindow,
+    Menu,
+    MenuItem,
+    ipcMain
 } = require('electron');
 
 const path = require('path');
@@ -27,6 +32,47 @@ const mainWinObject = {
 
 let mainWin;
 
+const menuTemplate = [
+    ...(process.platform === 'darwin' ? [{role: 'appMenu'}] : []),
+    {
+        label: 'Form',
+        submenu: [
+            {
+                label: 'Search',
+                accelerator: 'CmdOrCtrl+F',
+                click: () => mainWin.webContents.send('search-triggered'),
+                enabled: false
+            }
+        ]
+    },
+    {
+        label: 'Window',
+        submenu: [
+            { role: 'quit' },
+            { type: 'separator' },
+            { role: 'minimize' },
+            { role: 'close' }
+        ]
+    },
+    ...(ISDEVDIST ? [{
+            label: 'Developer',
+            submenu: [
+                {
+                    label: 'Toggle Developer Tools',
+                    accelerator: 'CmdOrCtrl+Shift+I',
+                    click: () => mainWin.webContents.toggleDevTools()
+                }
+            ]
+    }] : [])
+];
+
+const menu = Menu.buildFromTemplate(menuTemplate);
+
+ipcMain.on('request-update-search-enabled', (event, searchEnabled) => {
+    menu.items[1].submenu.items[0].enabled = searchEnabled;
+    event.returnValue = 0;
+});
+
 const createWindow = () => {
     mainWin = new BrowserWindow(mainWinObject);
 
@@ -37,6 +83,8 @@ const createWindow = () => {
     }));
 
     mainWin.on('closed', e => mainWin = null);
+
+    Menu.setApplicationMenu(menu);
 };
 
 app.on('ready', createWindow);

@@ -43,14 +43,6 @@
     margin-right: 7px;
 }
 
-#search-button {
-    font-size: 25pt;
-    color: #C0B283;
-    cursor: pointer;
-    float: right;
-    transform: translateY(-7px);
-}
-
 #main-content {
     width: 80%;
     margin-top: 50px;
