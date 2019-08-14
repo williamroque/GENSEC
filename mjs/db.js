@@ -13,8 +13,10 @@ const appdata = require('./appdata');
 
 let settings = appdata.readConfig();
 
+let client = null;
+
 function createServer(request, event) {
-    const client = net.createConnection({
+    client = net.createConnection({
         port: settings.port,
         host: settings.ip
     }, () => {
@@ -24,7 +26,6 @@ function createServer(request, event) {
 
     client.on('error', err => {
         event.returnValue = 'network_error';
-
         client.end();
     });
 
@@ -42,10 +43,6 @@ function createServer(request, event) {
             data += rawData.slice(0, rawData.length - 4);
 
             event.returnValue = data;
-
-            client.write('exit', 'utf8', () => {
-                client.end();
-            });
         } else {
             data += rawData;
         }
@@ -53,23 +50,33 @@ function createServer(request, event) {
 
     client.on('end', () => {
         console.log('Disconnected from server.');
+        client.end();
+        client = null;
     });
 }
 
+function makeRequest(request, event) {
+    if (client) {
+        client.write(request);
+    } else {
+        createServer(request, event);
+    }
+}
+
 function getData(event, path) {
-    createServer('request_data\n' + path, event);
+    makeRequest('request_data\n' + path, event);
 }
 
 function addRow(event, rowData, fileID) {
-    createServer('add\n' + rowData + '|' + fileID, event);
+    makeRequest('add\n' + rowData + '|' + fileID, event);
 }
 
 function deleteRow(event, rowIndex, fileID) {
-    createServer('delete\n' + rowIndex + '|' + fileID, event);
+    makeRequest('delete\n' + rowIndex + '|' + fileID, event);
 }
 
 function updateRow(event, rowIndex, rowData, fileID) {
-    createServer('update\n' + rowIndex + '%' + rowData + '|' + fileID, event);
+    makeRequest('update\n' + rowIndex + '%' + rowData + '|' + fileID, event);
 }
 
 function readSettings(event) {
@@ -83,3 +90,5 @@ function writeSettings(event, newSettings) {
 
     event.returnValue = appdata.writeConfig(settings);
 }
+
+

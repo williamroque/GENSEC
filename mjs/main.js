@@ -35,6 +35,30 @@ let mainWin;
 const menuTemplate = [
     ...(process.platform === 'darwin' ? [{role: 'appMenu'}] : []),
     {
+        label: 'Text',
+        submenu: [
+            {
+                label: 'Copy',
+                accelerator: 'CmdOrCtrl+C',
+                click: () => mainWin.webContents.send('copy'),
+                enabled: false
+            },
+            {
+                label: 'Paste',
+                accelerator: 'CmdOrCtrl+V',
+                click: () => mainWin.webContents.send('paste'),
+                enabled: false
+            },
+            { type: 'separator' },
+            {
+                label: 'Select All',
+                accelerator: 'CmdOrCtrl+A',
+                click: () => mainWin.webContents.send('select-all'),
+                enabled: false
+            },
+        ]
+    },
+    {
         label: 'Form',
         submenu: [
             {
@@ -68,9 +92,16 @@ const menuTemplate = [
 
 const menu = Menu.buildFromTemplate(menuTemplate);
 
-ipcMain.on('request-update-search-enabled', (event, searchEnabled) => {
-    menu.items[1].submenu.items[0].enabled = searchEnabled;
-    event.returnValue = 0;
+ipcMain.on('request-update-search-enabled', (_, searchEnabled) => {
+    menu.items[2].submenu.items[0].enabled = searchEnabled;
+});
+
+ipcMain.on('request-update-edit-enabled', (_, editEnabled) => {
+    menu.items[1].submenu.items.forEach(elem => {
+        if (elem.type !== 'separator') {
+            elem.enabled = editEnabled;
+        }
+    });
 });
 
 const createWindow = () => {

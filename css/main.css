@@ -45,6 +45,7 @@
 
 #main-content {
     width: 80%;
+    overflow-x: scroll;
     margin-top: 50px;
 }
 
@@ -196,10 +197,17 @@ textarea.form-input:focus, .form-textarea-active {
     font-family: helvetica;
     font-weight: 650;
     letter-spacing: .05em;
+    padding-left: 5px;
 }
 
 .filter-table-column {
     word-wrap: break-word;
+    padding-left: 5px;
+}
+
+td, th {
+    width: 125px;
+    min-width: 125px !important;
 }
 
 tbody {
@@ -217,8 +225,16 @@ tbody {
     display: table;
     table-layout: fixed;
     width: 100%;
-    margin-bottom: 3px;
+    margin: 5px 0;
     cursor: pointer;
+}
+
+.filter-table-row:nth-child(even) {
+    border-left: solid 2px #C0B283;
+}
+
+.filter-table-row:first-child {
+    margin-top: 3px;
 }
 
 * {

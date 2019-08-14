@@ -1,5 +1,7 @@
 const mutateOption = document.querySelector('#edit-contract');
 
+let currentlySelected;
+
 function addInputClass(className, index, input) {
     input
         .parentNode
@@ -89,6 +91,11 @@ function renderForm(data, fileID) {
             let click = () => {};
             let change = (_, e) => refreshState(e.target);
             let keydown = () => {};
+            let focus = (_, e) => {
+                requestUpdateEditEnabled(true);
+                currentlySelected = e.currentTarget;
+            };
+            let focusout = () => requestUpdateEditEnabled(false);
 
             if (col.type === 'submit') {
                 click = (dom, e) => {
@@ -141,6 +148,12 @@ function renderForm(data, fileID) {
             inputElement.addEventListener('keydown', e => {
                 keydown(dom, e);
             }, false);
+            inputElement.addEventListener('focus', e => {
+                focus(dom, e);
+            });
+            inputElement.addEventListener('focusout', e => {
+                focusout(dom, e);
+            });
 
             dom[col.label] = inputElement;
 
@@ -170,6 +183,18 @@ function editRow(rowData) {
         });
     }
 }
+
+ipcRenderer.on('copy', () => {
+    clipboard.writeText(window.getSelection().toString());
+});
+
+ipcRenderer.on('paste', () => {
+    document.execCommand('paste', clipboard.readText());
+});
+
+ipcRenderer.on('select-all', () => {
+    currentlySelected.select();
+});
 
 mutateOption.addEventListener('click', () => {
     isUpdate = false;

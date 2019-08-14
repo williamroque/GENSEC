@@ -1,4 +1,7 @@
-const { ipcRenderer } = require('electron');
+const {
+    ipcRenderer,
+    clipboard
+} = require('electron');
 
 function requestData(form) {
     return ipcRenderer.sendSync('request-data', form);
@@ -25,5 +28,9 @@ function requestReadSettings() {
 }
 
 function requestUpdateSearchEnabled(searchEnabled) {
-    return ipcRenderer.sendSync('request-update-search-enabled', searchEnabled);
+    ipcRenderer.send('request-update-search-enabled', searchEnabled);
+}
+
+function requestUpdateEditEnabled(editEnabled) {
+    ipcRenderer.send('request-update-edit-enabled', editEnabled);
 }
