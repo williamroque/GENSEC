@@ -99,11 +99,14 @@ class DataClientThread(threading.Thread):
                 return True
         return False
 
-    def send_encrypted(self, msg):
-        self.connection.send(rsa.encrypt(msg, self.pub_key).encode('utf-8'))
+    def send_encrypted(self, msg, key):
+        self.connection.send(rsa.encrypt(msg, key).encode('utf-8'))
 
-    def rec_encrypted(self):
-        return rsa.decrypt(self.connection.recv(1024).decode('utf-8'), self.prv_key)
+    def rec_encrypted(self, key):
+        mes = self.connection.recv(1024).decode('utf-8')
+        if mes:
+            return rsa.decrypt(mes, key)
+        return False
 
     def run(self):
         l_successful = False
@@ -113,7 +116,7 @@ class DataClientThread(threading.Thread):
             s_test = rsa.encrypt('patently-debatable-1208', self.client_key)
             self.connection.send('{};{}'.format('|'.join(map(str, self.pub_key)), s_test).encode('utf-8'))
 
-            username, password = self.rec_encrypted().split(';')
+            username, password = self.rec_encrypted(self.prv_key).split(';')
 
             if self.valid_credentials(username, password):
                 l_successful = True
@@ -125,8 +128,10 @@ class DataClientThread(threading.Thread):
 
         if l_successful:
             while True:
-                print('Waiting!')
-                mes = self.rec_encrypted()
+                mes = self.rec_encrypted(self.prv_key)
+
+                if not mes:
+                    break
 
                 message_rows = mes.split('\n') + ['']
                 command, body, *_ = message_rows
@@ -144,14 +149,12 @@ class DataClientThread(threading.Thread):
                     if not load_successful:
                         break
 
-                    print(command, body)
-
                 if command == 'request_data':
                     data = self.as_string()
                     data = data.replace('@', '')
 
-                    self.send_encrypted(data)
-                    self.send_encrypted('exit')
+                    self.send_encrypted(data, self.client_key)
+                    self.connection.send(b'exit')
 
                 elif command == 'add':
                     if not self.handle_mutate(self.add, self.row):
@@ -160,8 +163,6 @@ class DataClientThread(threading.Thread):
                     if not self.handle_mutate(self.delete, self.row):
                         break
                 elif command == 'update':
-                    print(body)
-
                     i, newRow = self.row.split('%')
 
                     self.delete(i)

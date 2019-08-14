@@ -8,7 +8,7 @@ port = 5000
 
 try:
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.settimeout(5)
+    client.settimeout(30)
     client.connect((ip, port))
 except socket.timeout:
     print('Could not connect to server.')
@@ -22,7 +22,15 @@ def send_encrypted(msg, pub):
     client.send(rsa.encrypt(msg, pub).encode('utf-8'))
 
 def rec_encrypted(prv):
-    return rsa.decrypt(client.recv(1024).decode('utf-8'))
+    data = ''
+    mes = client.recv(1024).decode('utf-8')
+    while True:
+        if mes[-4:] == 'exit':
+            data += mes[:-4]
+            break
+        data += mes
+        mes = client.recv(1024).decode('utf-8')
+    return rsa.decrypt(data, prv)
 
 pub_key, prv_key = rsa.generate_keys()
 
@@ -36,5 +44,5 @@ s_test = rsa.decrypt(s_test, prv_key)
 if s_test == 'patently-debatable-1208':
     send_encrypted('jetblack;viennablues', server_key)
 
-send_encrypted('request_data', server_key)
+send_encrypted('request_data\nintegrantes-operacao', server_key)
 print(rec_encrypted(prv_key))

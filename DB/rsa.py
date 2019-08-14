@@ -80,10 +80,28 @@ def generate_keys():
     return ((n, e), (n, d))
 
 def encrypt(t, pub_key):
-    return '-'.join([str(int(pow(to_n(section), int(pub_key[1]), int(pub_key[0])))) for section in split(t)])
+    cipher_sections = []
+
+    e = int(pub_key[1])
+    n = int(pub_key[0])
+
+    for section in split(t):
+        b = to_n(section)
+        cipher_sections.append(str(pow(b, e, n)))
+
+    return '-'.join(cipher_sections)
 
 def decrypt(t, prv_key):
-    return ''.join([to_s(int(pow(int(section), int(prv_key[1]), int(prv_key[0])))) for section in t.split('-')])
+    plain_sections = []
+
+    d = int(prv_key[1])
+    n = int(prv_key[0])
+
+    for section in t.split('-'):
+        b = int(section)
+        plain_sections.append(to_s(int(pow(b, d, n))))
+
+    return ''.join(plain_sections)
 
 def split(s):
     return [s[i:i+64] for i in range(0, len(s), 64)]
