@@ -99,14 +99,28 @@ class DataClientThread(threading.Thread):
                 return True
         return False
 
-    def send_encrypted(self, msg, key):
-        self.connection.send(rsa.encrypt(msg, key).encode('utf-8'))
+    def send_encrypted(self, msg):
+        self.connection.send(
+            '{}:{}'.format(
+                rsa.encrypt(self.hash(msg), self.prv_key),
+                rsa.encrypt(msg, self.client_key)
+            ).encode('utf-8')
+        )
 
-    def rec_encrypted(self, key):
-        mes = self.connection.recv(1024).decode('utf-8')
-        if mes:
-            return rsa.decrypt(mes, key)
-        return False
+    def rec_encrypted(self):
+        data = self.connection.recv(1024).decode('utf-8')
+
+        if not data:
+            return
+
+        data = data.split(':')
+        if len(data) == 2:
+            h = rsa.decrypt(data[0], self.client_key)
+            b = rsa.decrypt(data[1], self.prv_key)
+            if h == self.hash(b):
+                return b
+        print('Invalid data.')
+        return ''
 
     def run(self):
         l_successful = False
@@ -116,7 +130,7 @@ class DataClientThread(threading.Thread):
             s_test = rsa.encrypt('patently-debatable-1208', self.client_key)
             self.connection.send('{};{}'.format('|'.join(map(str, self.pub_key)), s_test).encode('utf-8'))
 
-            username, password = self.rec_encrypted(self.prv_key).split(';')
+            username, password = self.rec_encrypted().split(';')
 
             if self.valid_credentials(username, password):
                 l_successful = True
@@ -128,7 +142,7 @@ class DataClientThread(threading.Thread):
 
         if l_successful:
             while True:
-                mes = self.rec_encrypted(self.prv_key)
+                mes = self.rec_encrypted()
 
                 if not mes:
                     break
@@ -153,7 +167,7 @@ class DataClientThread(threading.Thread):
                     data = self.as_string()
                     data = data.replace('@', '')
 
-                    self.send_encrypted(data, self.client_key)
+                    self.send_encrypted(data)
                     self.connection.send(b'exit')
 
                 elif command == 'add':
@@ -170,6 +184,7 @@ class DataClientThread(threading.Thread):
                         break
                 elif command == 'exit':
                     self.connection.close()
-                    print('Done.')
                     break
+        self.connection.close()
+        print('Done.')
 

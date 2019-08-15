@@ -28,15 +28,16 @@ with open('smallprimes.txt', 'r') as f:
     small_primes = f.read().split(';')
 
 def generate_prime(μl):
-    δp = random.randint(10 ** μl, 10 ** (μl + 1))
-    if δp % 2 == 0:
-        δp += 1
-    for p in small_primes:
-        if δp % int(p) == 0:
-            return generate_prime(μl)
-    if not miller_rabin(δp):
-        return generate_prime(μl)
-    return δp
+    while True:
+        δp = random.randint(10 ** μl, 10 ** (μl + 1))
+        if δp % 2 == 0:
+            δp += 1
+        for p in small_primes:
+            if δp % int(p) == 0:
+                continue
+        if not miller_rabin(δp):
+            continue
+        return δp
 
 def egcd(a, b):
     if a == 0:
@@ -104,4 +105,4 @@ def decrypt(t, prv_key):
     return ''.join(plain_sections)
 
 def split(s):
-    return [s[i:i+64] for i in range(0, len(s), 64)]
+    return [s[i:i+32] for i in range(0, len(s), 32)]

@@ -1,6 +1,7 @@
 import socket
 import sys
 import rsa
+import hashlib
 from errno import ENETUNREACH
 
 ip = '127.0.0.1'
@@ -18,8 +19,16 @@ except IOError as e:
         print('Client not connected.')
         sys.exit(0)
 
-def send_encrypted(msg, pub):
-    client.send(rsa.encrypt(msg, pub).encode('utf-8'))
+def create_hash(m):
+    return hashlib.sha256(m.encode('utf-8')).hexdigest()
+
+def send_encrypted(msg, t_pub, s_prv):
+    client.send(
+        '{}:{}'.format(
+            rsa.encrypt(create_hash(msg), s_prv),
+            rsa.encrypt(msg, t_pub)
+        ).encode('utf-8')
+    )
 
 def rec_encrypted(prv):
     data = ''
@@ -30,7 +39,16 @@ def rec_encrypted(prv):
             break
         data += mes
         mes = client.recv(1024).decode('utf-8')
-    return rsa.decrypt(data, prv)
+    try:
+        h, b = data.split(':')
+        h = rsa.decrypt(h, server_key)
+        b = rsa.decrypt(b, prv)
+        if h == create_hash(b):
+            return b
+        raise Exception
+    except Exception as e:
+        print(e)
+        return ''
 
 pub_key, prv_key = rsa.generate_keys()
 
@@ -42,7 +60,8 @@ server_key = server_key.split('|')
 s_test = rsa.decrypt(s_test, prv_key)
 
 if s_test == 'patently-debatable-1208':
-    send_encrypted('jetblack;viennablues', server_key)
+    send_encrypted('jetblack;viennablues', server_key, prv_key)
 
-send_encrypted('request_data\nintegrantes-operacao', server_key)
+send_encrypted('request_data\nintegrantes-operacao', server_key, prv_key)
+
 print(rec_encrypted(prv_key))
