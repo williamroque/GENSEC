@@ -1,7 +1,9 @@
 import socket
 import sys
+
 import rsa
 import hashlib
+
 from errno import ENETUNREACH
 
 ip = '127.0.0.1'
@@ -41,7 +43,7 @@ def rec_encrypted(prv):
         mes = client.recv(1024).decode('utf-8')
     try:
         h, b = data.split(':')
-        h = rsa.decrypt(h, server_key)
+        h = rsa.decrypt(h, server_key, True)
         b = rsa.decrypt(b, prv)
         if h == create_hash(b):
             return b

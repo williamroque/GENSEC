@@ -39,17 +39,21 @@ def generate_prime(μl):
             continue
         return δp
 
-def egcd(a, b):
-    if a == 0:
-        return (b, 0, 1)
-    else:
-        g, x, y = egcd(b % a, a)
-        return (g, y - (b // a) * x, x)
-
-def mulinv(a, b):
-    g, x, _ = egcd(a, b)
-    if g == 1:
-        return x % b
+####### taken from rosettacode.org #######\
+                                          #
+def egcd(a, b):                           #
+    if a == 0:                            #
+        return (b, 0, 1)                  #
+    else:                                 #
+        g, x, y = egcd(b % a, a)          #
+        return (g, y - (b // a) * x, x)   #
+                                          #
+def mulinv(a, b):                         #
+    g, x, _ = egcd(a, b)                  #
+    if g == 1:                            #
+        return x % b                      #
+                                          #
+#######----------------------------#######/
 
 def to_n(s):
     s_n = ''
@@ -70,6 +74,7 @@ def to_s(n):
     return s
 
 def generate_keys():
+    global p, q
     p = generate_prime(150)
     q = generate_prime(100)
     n = p * q
@@ -92,17 +97,34 @@ def encrypt(t, pub_key):
 
     return '-'.join(cipher_sections)
 
-def decrypt(t, prv_key):
+def decrypt(t, prv_key, is_reversed=False):
+    n = int(prv_key[0])
+    d = int(prv_key[1])
+
+    t = t.split('-')
+
     plain_sections = []
 
-    d = int(prv_key[1])
-    n = int(prv_key[0])
+    if is_reversed:
+        for section in t:
+            section = int(section)
+            plain_sections.append(to_s(int(pow(section, d, n))))
+    else:
+        for section in t:
+            section = int(section)
 
-    for section in t.split('-'):
-        b = int(section)
-        plain_sections.append(to_s(int(pow(b, d, n))))
+            dp = d % (p - 1)
+            dq = d % (q - 1)
+            qinv = mulinv(q, p)
+
+            m1 = pow(section, dp, p)
+            m2 = pow(section, dq, q)
+
+            h = qinv * (m1 - m2) % p
+
+            plain_sections.append(to_s(int(m2 + h * q)))
 
     return ''.join(plain_sections)
 
 def split(s):
-    return [s[i:i+32] for i in range(0, len(s), 32)]
+    return [s[i:i+64] for i in range(0, len(s), 64)]

@@ -1,4 +1,5 @@
 import threading
+
 import fcntl
 import os
 
@@ -20,6 +21,7 @@ class DataClientThread(threading.Thread):
         print('Thread started for client {} at port {}'.format(ip, port))
 
         self.last_request = datetime.datetime.now()
+
         self.pub_key, self.prv_key = rsa.generate_keys()
 
     def expand_path(self, file):
@@ -115,7 +117,7 @@ class DataClientThread(threading.Thread):
 
         data = data.split(':')
         if len(data) == 2:
-            h = rsa.decrypt(data[0], self.client_key)
+            h = rsa.decrypt(data[0], self.client_key, True)
             b = rsa.decrypt(data[1], self.prv_key)
             if h == self.hash(b):
                 return b
@@ -127,7 +129,9 @@ class DataClientThread(threading.Thread):
 
         try:
             self.client_key = self.connection.recv(1024).decode('utf-8').split('|')
+
             s_test = rsa.encrypt('patently-debatable-1208', self.client_key)
+
             self.connection.send('{};{}'.format('|'.join(map(str, self.pub_key)), s_test).encode('utf-8'))
 
             username, password = self.rec_encrypted().split(';')
@@ -185,6 +189,7 @@ class DataClientThread(threading.Thread):
                 elif command == 'exit':
                     self.connection.close()
                     break
+
         self.connection.close()
         print('Done.')
 
