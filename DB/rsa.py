@@ -1,6 +1,25 @@
 import random
 import math
 
+u_chars = []
+with open('ucharlist.txt', 'r') as f:
+    u_chars = f.read().split(' ')
+
+char_range = lambda a, b: [chr(x) for x in range(ord(a), ord(b) + 1)]
+
+CHAR_TABLE = [
+    '§',
+    *char_range('A', 'Z'),
+    *char_range('a', 'z'),
+    *map(str, range(10)),
+    ';',
+    ' ',
+    '-',
+    '_',
+    '\n',
+    *u_chars
+]
+
 def miller_rabin(n):
     r = 0
     d = n - 1
@@ -58,19 +77,19 @@ def mulinv(a, b):                         #
 def to_n(s):
     s_n = ''
     for char in s:
-        n = ord(char)
-        if 0 < n < 1000:
-            s_n += str(n).zfill(3)
+        if char in CHAR_TABLE:
+            i = CHAR_TABLE.index(char)
+            s_n += str(i).zfill(2)
     return int(s_n)
 
 def to_s(n):
     n_s = str(n)
     l_s = len(n_s)
     s = ''
-    if l_s % 3 > 0:
-        n_s = n_s.zfill(l_s + (3 - l_s % 3))
-    for i in range(0, l_s, 3):
-        s += chr(int(n_s[i:i + 3]))
+    if l_s % 2 > 0:
+        n_s = n_s.zfill(l_s + (2 - l_s % 2))
+    for i in range(0, l_s, 2):
+        s += CHAR_TABLE[int(n_s[i:i + 2])]
     return s
 
 def generate_keys():

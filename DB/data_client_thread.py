@@ -130,6 +130,9 @@ class DataClientThread(threading.Thread):
         try:
             self.client_key = self.connection.recv(1024).decode('utf-8').split('|')
 
+            if not self.client_key or self.client_key[0] == 'exit':
+                return
+
             s_test = rsa.encrypt('patently-debatable-1208', self.client_key)
 
             self.connection.send('{};{}'.format('|'.join(map(str, self.pub_key)), s_test).encode('utf-8'))
