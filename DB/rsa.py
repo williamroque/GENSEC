@@ -102,13 +102,13 @@ def generate_keys():
     e = 65537
     d = mulinv(e, λ)
 
-    return ((n, e), (n, d))
+    return ((e, n), (d, n))
 
 def encrypt(t, pub_key):
     cipher_sections = []
 
-    e = int(pub_key[1])
-    n = int(pub_key[0])
+    e = int(pub_key[0])
+    n = int(pub_key[1])
 
     for section in split(t):
         b = to_n(section)
@@ -117,8 +117,8 @@ def encrypt(t, pub_key):
     return '-'.join(cipher_sections)
 
 def decrypt(t, prv_key, is_reversed=False):
-    n = int(prv_key[0])
-    d = int(prv_key[1])
+    d = int(prv_key[0])
+    n = int(prv_key[1])
 
     t = t.split('-')
 

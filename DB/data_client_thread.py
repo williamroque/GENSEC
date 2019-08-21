@@ -4,6 +4,7 @@ import fcntl
 import os
 
 import socket
+import errno
 
 import json
 
@@ -11,6 +12,8 @@ import datetime
 
 import rsa
 import hashlib
+
+import thread_clock
 
 class DataClientThread(threading.Thread):
     def __init__(self, conn, ip, port):
@@ -23,6 +26,9 @@ class DataClientThread(threading.Thread):
         self.last_request = datetime.datetime.now()
 
         self.pub_key, self.prv_key = rsa.generate_keys()
+
+        t_clock = thread_clock.ThreadClock(self.ping)
+        t_clock.start()
 
     def expand_path(self, file):
         try:
@@ -110,19 +116,28 @@ class DataClientThread(threading.Thread):
         )
 
     def rec_encrypted(self):
-        data = self.connection.recv(1024).decode('utf-8')
+        try:
+            data = self.connection.recv(1024).decode('utf-8')
+        except socket.error as e:
+            if e.errno != errno.ECONNRESET:
+                raise
+            return
 
         if not data:
             return
 
         data = data.split(':')
         if len(data) == 2:
-            h = rsa.decrypt(data[0], self.client_key, True)
-            b = rsa.decrypt(data[1], self.prv_key)
-            if h == self.hash(b):
-                return b
+            if data[0] and data[1]:
+                h = rsa.decrypt(data[0], self.client_key, True)
+                b = rsa.decrypt(data[1], self.prv_key)
+                if h == self.hash(b):
+                    return b
         print('Invalid data.')
         return ''
+
+    def ping(self):
+        self.connection.send(b'ping')
 
     def run(self):
         l_successful = False

@@ -1,4 +1,5 @@
 const { app, ipcMain } = require('electron');
+const rsa = require('./rsa');
 
 ipcMain.on('request-data', getData);
 ipcMain.on('request-add-row', addRow);
@@ -90,5 +91,4 @@ function writeSettings(event, newSettings) {
 
     event.returnValue = appdata.writeConfig(settings);
 }
-
 
