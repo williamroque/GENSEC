@@ -1,69 +1,75 @@
 const { spawn } = require('child_process');
 
-function generateKeys() {
-    const subprocess = spawn('python3', ['generate_keys.py']);
+class RSA {
+    generateKeys() {
+        const subprocess = spawn('python3', ['generate_keys.py']);
 
-    let out = '';
+        let out = '';
 
-    subprocess.stdout.on('data', data => {
-        out += data.toString().trim();
-    });
+        subprocess.stdout.on('data', data => {
+            out += data.toString().trim();
+        });
 
-    return new Promise(resolve => {
-        subprocess.on('close', () => {
-            const [ n, keys, primes ] = out.split('|');
-            const [ e, d ] = keys.split(';');
+        return new Promise(resolve => {
+            subprocess.on('close', () => {
+                const [ n, keys, primes ] = out.split('|');
+                const [ e, d ] = keys.split(';');
 
-            resolve({
-                pub: [e, n],
-                prv: [d, n],
-                primes: primes.split(';')
+                resolve({
+                    pub: [e, n],
+                    prv: [d, n],
+                    primes: primes.split(';')
+                });
             });
         });
-    });
-}
+    }
 
-function encrypt(msg, key) {
-    const subprocess = spawn('python3', ['encrypt.py']);
+    encrypt(msg, key) {
+        const subprocess = spawn('python3', ['encrypt.py']);
 
-    subprocess.stdin.write(`${key[0]}:${key[1]}\n${msg}`);
-    subprocess.stdin.end();
+        subprocess.stdin.write(`${key[0]}:${key[1]}\n${msg}`);
+        subprocess.stdin.end();
 
-    let out = '';
+        let out = '';
 
-    subprocess.stdout.on('data', data => {
-        out += data.toString().trim();
-    });
-
-    return new Promise(resolve => {
-        subprocess.on('close', () => {
-            resolve(out);
+        subprocess.stdout.on('data', data => {
+            out += data.toString().trim();
         });
-    });
-}
 
-function decrypt(msg, key, reversed=false) {
-    const subprocess = spawn('python3', ['decrypt.py']);
-
-    subprocess.stdin.write(`${key[0]}:${key[1]}\n${reversed | 0}\n${msg}`);
-    subprocess.stdin.end();
-
-    let out = '';
-
-    subprocess.stdout.on('data', data => {
-        out += data.toString().trim();
-    });
-
-    return new Promise(resolve => {
-        subprocess.on('close', () => {
-            resolve(out);
+        return new Promise(resolve => {
+            subprocess.on('close', () => {
+                resolve(out);
+            });
         });
-    });
+    }
+
+    decrypt(msg, key, primes, callback=()=>{}) {
+        this.out = '';
+
+        const subprocess = spawn('python3', ['decrypt.py']);
+
+        subprocess.stdin.write(`${key[0]}:${key[1]}${primes ? ';' + primes.join(':') : ''}\n${!primes|0}\n${msg}`);
+        subprocess.stdin.end();
+
+        subprocess.stdout.on('data', data => {
+            data = data.toString().trim();
+            callback(data);
+
+            this.out += data;
+        });
+
+        subprocess.stderr.on('data', data => {
+            console.log(data.toString());
+        });
+
+        return {
+            then: c => {
+                subprocess.on('close', () => {
+                    c(this.out);
+                });
+            }
+        };
+    }
 }
 
-module.exports = {
-    generateKeys: generateKeys,
-    encrypt: encrypt,
-    decrypt: decrypt
-};
-
+module.exports = RSA;

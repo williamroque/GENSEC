@@ -1,7 +1,7 @@
 const net = require('net');
 const crypto = require('crypto');
 
-const rsa = require('./rsa');
+const RSA = require('./rsa');
 
 const settings = { ip: 'localhost', port: 5000 };
 
@@ -15,6 +15,8 @@ class Connection {
         this.host = host;
         this.port = port;
 
+        this.rsa = new RSA();
+
         this.init = new Promise(resolve => {
             this.generateKeys().then(keys => {
                 this.keys = keys;
@@ -26,7 +28,7 @@ class Connection {
 
     generateKeys() {
         return new Promise(resolve => {
-            rsa.generateKeys().then(keys => {
+            this.rsa.generateKeys().then(keys => {
                 resolve(keys);
             }).catch(e => console.log(e));
         });
@@ -56,7 +58,7 @@ class Connection {
                 this.client.end();
             });
 
-            this.data = '';
+            this.data = [];
             this.client.on('data', data => {
                 data = data.toString();
                 if (data === 'ping') {
@@ -65,7 +67,7 @@ class Connection {
                 switch (phase) {
                     case 0:
                         let [ serverKey, sTest ] = data.split(';');
-                        rsa.decrypt(sTest, this.keys.prv).then(sTest => {
+                        this.rsa.decrypt(sTest, this.keys.prv, this.keys.primes).then(sTest => {
                             if (sTest === 'patently-debatable-1208') {
                                 this.serverKey = serverKey.split('|');
                                 this.sendEncrypted(`${username};${password}`, this.serverKey, this.keys.prv);
@@ -74,12 +76,12 @@ class Connection {
                                 this.client.end();
                                 reject('Unable to establish connection.');
                             }
-                        }).catch(e => console.log(e));
+                        });
 
                         phase++;
                         break;
                     case 1:
-                        this.data += data;
+                        this.data.push(data);
                 }
             });
 
@@ -95,32 +97,36 @@ class Connection {
     }
 
     sendEncrypted(msg, targetPub, localPrv) {
-        rsa.encrypt(this.createHash(msg), localPrv).then(hash => {
-            rsa.encrypt(msg, targetPub).then(body => {
+        this.rsa.encrypt(this.createHash(msg), localPrv).then(hash => {
+            this.rsa.encrypt(msg, targetPub).then(body => {
                 this.client.write(`${hash}:${body}`);
             });
         });
     }
 
-    recEncrypted(prv) {
-        this.data = '';
+    recEncrypted(prv, callback) {
+        this.data = [];
+
         return new Promise((resolve, reject) => {
             const iloop = () => {
                 let loopCancelled = false;
-                if (this.data.slice(this.data.length - 4) === 'exit') {
-                    let [ hash, body ] = this.data.slice(0, this.data.length - 4).split(':');
 
-                    rsa.decrypt(hash, this.serverKey, true).then(hash => {
-                        rsa.decrypt(body, prv).then(body => {
-                            if (hash === this.createHash(body)) {
-                                resolve(body);
-                            } else {
-                                reject('Invalid hash.');
-                            }
-                        }).catch(e => console.log(e));
-                    }).catch(e => console.log(e));
+                if (this.data.length > 0) {
+                    if (this.data.slice(-1)[0].slice(-4) === 'exit') {
+                        let [ hash, body ] = this.data.join('').slice(0, -4).split(':');
 
-                    loopCancelled = true;
+                        this.rsa.decrypt(hash, this.serverKey).then(hash => {
+                            this.rsa.decrypt(body, prv, this.keys.primes, callback).then(body => {
+                                if (hash === this.createHash(body)) {
+                                    resolve(body);
+                                } else {
+                                    reject('Invalid hash.');
+                                }
+                            });
+                        });
+
+                        loopCancelled = true;
+                    }
                 }
 
                 if (!loopCancelled) {
@@ -131,12 +137,11 @@ class Connection {
         });
     }
 
-    makeRequest(req) {
+    makeRequest(req, callback) {
         return new Promise((resolve, reject) => {
-            this.data = '';
             this.sendEncrypted(req, this.serverKey, this.keys.prv);
 
-            this.recEncrypted(this.keys.prv)
+            this.recEncrypted(this.keys.prv, callback)
                 .then(body => resolve(body))
                 .catch(e => reject(e));
         });
@@ -158,10 +163,9 @@ const client = new Connection(settings.host, settings.port);
 
 client.init.then()
     .then(() => {
-        return client.makeRequest('request_data\nintegrantes-operacao')
+        return client.makeRequest('request_data\nintegrantes-operacao', console.log)
     })
     .then(body => {
-        console.log(body);
         client.close();
         require('process').exit();
     }).catch(e => console.log(e));

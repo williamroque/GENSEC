@@ -50,8 +50,22 @@ lines = sys.stdin.readlines()
 
 key, is_reversed, *msg = lines
 
-d, n = list(map(int, key.split(':')))
-is_reversed = bool(is_reversed)
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+is_reversed = bool(int(is_reversed))
+
+keys = primes = []
+d = n = p = q = 0
+
+if not is_reversed:
+    keys, primes = key.strip().split(';')
+    p, q = list(map(int, primes.split(':')))
+else:
+    keys = key.strip()
+
+d, n = list(map(int, keys.split(':')))
+
 msg = '\n'.join(msg).split('-')
 
 plain_sections = []
@@ -68,7 +82,7 @@ def decrypt_section(section):
 
     h = qinv * (m1 - m2) % p
 
-    plain_sections.append(to_s(int(m2 + h * q)))
+    return to_s(int(m2 + h * q))
 
 if is_reversed:
     for section in msg:
