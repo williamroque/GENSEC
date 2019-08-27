@@ -163,9 +163,16 @@ const client = new Connection(settings.host, settings.port);
 
 client.init.then()
     .then(() => {
-        return client.makeRequest('request_data\nintegrantes-operacao', console.log)
+        return client.makeRequest('request_data\nintegrantes-operacao', data => {
+            //process.stdout.write(data);
+        });
     })
     .then(body => {
+        console.log(body);
         client.close();
         require('process').exit();
-    }).catch(e => console.log(e));
+    }).catch(e => {
+        console.log(e)
+        client.close();
+        require('process').exit();
+    });

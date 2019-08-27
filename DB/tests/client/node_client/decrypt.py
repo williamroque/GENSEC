@@ -1,6 +1,8 @@
 import sys
 import multiprocessing as mp
 
+import re
+
 u_chars = []
 with open('ucharlist.txt', 'r') as f:
     u_chars = f.read().split(' ')
@@ -92,4 +94,4 @@ else:
     with mp.Pool(mp.cpu_count()) as p:
         plain_sections = p.map(decrypt_section, msg)
 
-print(''.join(plain_sections))
+print(re.sub('\n{2,}', '\n', ''.join(plain_sections)), end='')

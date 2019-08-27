@@ -52,14 +52,14 @@ class RSA {
         subprocess.stdin.end();
 
         subprocess.stdout.on('data', data => {
-            data = data.toString().trim();
+            data = data.toString();
             callback(data);
 
             this.out += data;
         });
 
         subprocess.stderr.on('data', data => {
-            console.log(data.toString());
+            process.stdout.write(data.toString());
         });
 
         return {
