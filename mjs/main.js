@@ -9,26 +9,114 @@ const {
     ipcMain
 } = require('electron');
 
+const windowStateKeeper = require('electron-window-state');
+
 const path = require('path');
 const url = require('url');
 
-const data = require('./db');
+const fs = require('fs');
 
-const mainWinObject = {
-    width: 1150,
-    height: 750,
-    center: true,
-    frame: false,
-    minWidth: 890,
-    minHeight: 610,
-    maxWidth: 1150,
-    maxHeight: 770,
-    fullscreen: false,
-    backgroundColor: '#0A0A0A',
-    webPreferences: {
-        nodeIntegration: true
+const Connection = require('./connection');
+const appdata = require('./appdata');
+
+const { appdataPath } = appdata;
+const appdataResources = require('./appdata-resources');
+
+appdataResources.forEach(p => {
+    const [ fileName, fileContent ] = p;
+    const filePath = `${appdataPath}/${fileName}`;
+
+    if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, fileContent);
     }
+});
+
+let settings;
+
+const username = 'jetblack';
+const password = 'viennablues';
+
+let client;
+
+dialog.showErrorBox = (title, content) => {
+    console.log(`${title}\n${content}`);
 };
+
+function readSettings(event) {
+    event.returnValue = settings;
+}
+
+function writeSettings(event, newSettings) {
+    Object.keys(newSettings).forEach(setting => {
+        settings[setting] = newSettings[setting];
+    });
+
+    event.returnValue = appdata.writeConfig(settings);
+}
+
+function getData(event, path) {
+    if (client) {
+        client.makeRequest('request_data\n' + path, ()=>{}).then(data => {
+            event.returnValue = data;
+        }).catch(console.log);
+    }
+}
+
+function addRow(event, rowData, fileID) {
+    if (client) {
+        client.makeRequest('add\n' + rowData + '|' + fileID).then(data => {
+            event.returnValue = data;
+        }).catch(console.log);
+    }
+}
+
+function deleteRow(event, rowIndex, fileID) {
+    if (client) {
+        client.makeRequest('delete\n' + rowIndex + '|' + fileID).then(data => {
+            event.returnValue = data;
+        }).catch(console.log);
+    }
+}
+
+function updateRow(event, rowIndex, rowData, fileID) {
+    if (client) {
+        client.makeRequest('update\n' + rowIndex + '%' + rowData + '|' + fileID).then(data => {
+            event.returnValue = data;
+        }).catch(console.log);
+    }
+}
+
+ipcMain.on('request-data', getData);
+ipcMain.on('request-add-row', addRow);
+ipcMain.on('request-delete-row', deleteRow);
+ipcMain.on('request-update-row', updateRow);
+ipcMain.on('request-read-settings', readSettings);
+ipcMain.on('request-write-settings', writeSettings);
+
+ipcMain.on('request-establish-connection', event => {
+    settings = appdata.readConfig()
+
+    if (client) {
+        client.close();
+        client = null;
+    }
+
+    client = new Connection(
+        settings.host,
+        settings.port,
+        username,
+        password,
+        event,
+        appdataPath
+    );
+
+    client.init.then()
+        .then(() => {
+            event.returnValue = 'connection_established';
+        }).catch(err => {
+            event.returnValue = err;
+        });
+});
 
 let mainWin;
 
@@ -105,7 +193,28 @@ ipcMain.on('request-update-edit-enabled', (_, editEnabled) => {
 });
 
 const createWindow = () => {
-    mainWin = new BrowserWindow(mainWinObject);
+    let mainWindowState = windowStateKeeper({
+        defaultWidth: 1150,
+        defaultHeight: 750
+    });
+
+    mainWin = new BrowserWindow({
+        width: mainWindowState.width,
+        height: mainWindowState.height,
+        center: true,
+        frame: false,
+        minWidth: 890,
+        minHeight: 610,
+        maxWidth: 1150,
+        maxHeight: 770,
+        fullscreen: false,
+        backgroundColor: '#0A0A0A',
+        webPreferences: {
+            nodeIntegration: true
+        }
+    });
+
+    mainWindowState.manage(mainWin);
 
     mainWin.loadURL(url.format({
         pathname: path.join(__dirname, '../html/index.html'),

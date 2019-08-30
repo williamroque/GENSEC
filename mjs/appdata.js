@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const app = require('electron').app;
 
-const configPath = app.getPath('userData') + path.normalize('/config.json');
+const appdataPath = app.getPath('userData');
+const configPath = appdataPath + path.normalize('/config.json');
 
 let data = {
     ip: '0.0.0.0',
@@ -30,7 +31,4 @@ if (!fs.existsSync(configPath)) {
     writeConfig(data);
 }
 
-module.exports = {
-    writeConfig: writeConfig,
-    readConfig: readConfig
-};
+module.exports = { writeConfig, readConfig, appdataPath };

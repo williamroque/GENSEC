@@ -49,7 +49,9 @@ function handleRowClick(e) {
 
     const deleteHandler = () => {
         indexShifts.add(formIndex);
-        handleWriteCode(requestDeleteRow(getRelativeIndex(formIndex), currentForm.id));
+        handleReturnCode(
+            requestDeleteRow(getRelativeIndex(formIndex), currentForm.id)
+        );
         this.remove();
     };
 
@@ -68,14 +70,7 @@ function renderFilterTable(form, formData, filter) {
         data = dataFull;
     } else {
         data = requestData(form.id);
-        if (!handleWriteCode(data)) {
-            data = data.split('\n').map(row => row.split(';'));
-        } else {
-            virtualPath.pop();
-            isForm = false;
-            update(false);
-            return;
-        }
+        data = data.split('\n').map(row => row.split(';'));
         dataFull = data;
         filter = () => true;
     }

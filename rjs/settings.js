@@ -61,5 +61,8 @@ saveSettingsButton.addEventListener('click', () => {
         showMessagePrompt('Unable to write settings.', 2000);
     } else {
         showMessagePrompt('Successfully wrote settings.', 1500);
+        if (isConnected) {
+            reconnect();
+        }
     }
 });

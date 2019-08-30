@@ -45,8 +45,10 @@
 
 #main-content {
     width: 80%;
-    overflow-x: scroll;
     margin-top: 50px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-height: 500px;
 }
 
 #directory-list {
@@ -69,9 +71,22 @@
 }
 
 .form-table {
+    overflow-y: auto;
     width: 95%;
-    height: 95%;
+    height: 500px;
     margin: 0 auto;
+    padding-bottom: 50px;
+    border-bottom: solid 1px #EEE;
+    transition-duration: .1s;
+}
+
+.form-table::-webkit-scrollbar {
+    width: 0 !important;
+}
+
+.form-border-active {
+    border-bottom: solid 1px #C0B283;
+    transition-duration: .1s;
 }
 
 *:focus {
@@ -80,13 +95,20 @@
 
 .form-row {
     width: 100%;
-    display: block;
+    height: 40px;
+    display: flex;
+    align-items: flex-end;
     margin-top: 15px;
     box-sizing: border-box;
 }
 
+.textarea-row {
+    height: 100px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
 .form-col {
-    height: 30px;
     padding-right: 8px;
     box-sizing: border-box;
     display: inline-block;
@@ -130,7 +152,8 @@
 }
 
 textarea.form-input {
-    margin-top: 20px;
+    display: block;
+    margin-top: 37px;
     border: solid 1px #CCC;
     resize: none;
     padding: 5px;
@@ -143,9 +166,9 @@ textarea.form-input {
 }
 
 label {
-    position: absolute;
+    position: relative;
     float: left;
-    transform: translate(7px, 4px);
+    transform: translate(7px, 18px);
     text-transform: uppercase;
     font-family: helvetica;
     font-weight: 300;
@@ -161,7 +184,7 @@ label {
     color: #C0B283;
     font-size: 8pt;
     font-weight: normal;
-    transform: translate(2px, -10px);
+    transform: translate(2px, 0);
 }
 
 .form-col:focus-within .form-textarea-label,
@@ -230,7 +253,7 @@ tbody {
 }
 
 .filter-table-row:nth-child(even) {
-    border-left: solid 2px #C0B283;
+    /*border-left: solid 2px #C0B283;*/
 }
 
 .filter-table-row:first-child {

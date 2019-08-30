@@ -1,5 +1,7 @@
 import random
 
+import os.path as op
+
 def miller_rabin(n):
     r = 0
     d = n - 1
@@ -23,7 +25,7 @@ def miller_rabin(n):
     return True
 
 small_primes = []
-with open('smallprimes.txt', 'r') as f:
+with open(op.join(op.abspath(op.dirname(__file__)), 'smallprimes.txt'), 'r') as f:
     small_primes = f.read().split(';')
 
 def generate_prime(μl):
@@ -38,7 +40,7 @@ def generate_prime(μl):
             continue
         return δp
 
-####### taken from rosettacode.org #######\
+####### taken from rosettacode.org #######
                                           #
 def egcd(a, b):                           #
     if a == 0:                            #
@@ -52,7 +54,7 @@ def mulinv(a, b):                         #
     if g == 1:                            #
         return x % b                      #
                                           #
-#######----------------------------#######/
+#######----------------------------#######
 
 p = generate_prime(150)
 q = generate_prime(100)

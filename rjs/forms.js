@@ -42,6 +42,17 @@ function renderForm(data, fileID) {
     const formTable = document.createElement('DIV');
     formTable.setAttribute('class', 'form-table');
 
+    let endScrollTimeout;
+    formTable.addEventListener('scroll', () => {
+        if (endScrollTimeout) {
+            clearTimeout(endScrollTimeout);
+        }
+        formTable.classList.add('form-border-active');
+        endScrollTimeout = setTimeout(() => {
+            formTable.classList.remove('form-border-active');
+        }, 1500);
+    }, false);
+
     data.form.forEach((row, i) => {
         const rowElement = document.createElement('DIV');
         rowElement.setAttribute('class', 'form-row');
@@ -76,6 +87,7 @@ function renderForm(data, fileID) {
                     labelElement.setAttribute('class', 'form-text-input-label');
                 } else {
                     labelElement.setAttribute('class', 'form-textarea-label');
+                    rowElement.classList.add('textarea-row');
                 }
 
                 const labelText = document.createTextNode(col.label);
@@ -131,7 +143,7 @@ function renderForm(data, fileID) {
                         }
                     }
 
-                    handleWriteCode(returnCode);
+                    handleReturnCode(returnCode);
                 };
             }
 

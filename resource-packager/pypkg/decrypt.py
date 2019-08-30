@@ -1,7 +1,12 @@
 import sys
+import multiprocessing as mp
+
+import os.path as op
+
+import re
 
 u_chars = []
-with open('ucharlist.txt', 'r') as f:
+with open(op.join(op.abspath(op.dirname(__file__)), 'ucharlist.txt'), 'r') as f:
     u_chars = f.read().split(' ')
 
 char_range = lambda a, b: [chr(x) for x in range(ord(a), ord(b) + 1)]
@@ -15,11 +20,15 @@ CHAR_TABLE = [
     ' ',
     '-',
     '_',
-    '\n',
+    '|',
+    '%',
+    ':',
+    '@',
+    '\\n',
     *u_chars
 ]
 
-####### taken from rosettacode.org #######\
+####### taken from rosettacode.org #######
                                           #
 def egcd(a, b):                           #
     if a == 0:                            #
@@ -33,7 +42,7 @@ def mulinv(a, b):                         #
     if g == 1:                            #
         return x % b                      #
                                           #
-#######----------------------------#######/
+#######----------------------------#######
 
 def to_s(n):
     n_s = str(n)
@@ -45,30 +54,50 @@ def to_s(n):
         s += CHAR_TABLE[int(n_s[i:i + 2])]
     return s
 
-msg = sys.argv[1].split('-')
-d = int(sys.argv[2])
-n = int(sys.argv[3])
-is_reversed = bool(sys.argv[4])
+lines = sys.stdin.readlines()
+
+key, is_reversed, *msg = lines
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+is_reversed = bool(int(is_reversed))
+
+keys = primes = []
+d = n = p = q = 0
+
+if not is_reversed:
+    keys, primes = key.strip().split(';')
+    p, q = list(map(int, primes.split(':')))
+else:
+    keys = key.strip()
+
+d, n = list(map(int, keys.split(':')))
+
+msg = '\\n'.join(msg).split('-')
 
 plain_sections = []
+
+def decrypt_section(section):
+    section = int(section)
+
+    dp = d % (p - 1)
+    dq = d % (q - 1)
+    qinv = mulinv(q, p)
+
+    m1 = pow(section, dp, p)
+    m2 = pow(section, dq, q)
+
+    h = qinv * (m1 - m2) % p
+
+    return to_s(int(m2 + h * q))
 
 if is_reversed:
     for section in msg:
         section = int(section)
         plain_sections.append(to_s(int(pow(section, d, n))))
 else:
-    for section in msg:
-        section = int(section)
+    with mp.Pool(mp.cpu_count()) as p:
+        plain_sections = p.map(decrypt_section, msg)
 
-        dp = d % (p - 1)
-        dq = d % (q - 1)
-        qinv = mulinv(q, p)
-
-        m1 = pow(section, dp, p)
-        m2 = pow(section, dq, q)
-
-        h = qinv * (m1 - m2) % p
-
-        plain_sections.append(to_s(int(m2 + h * q)))
-
-print(''.join(plain_sections))
+print(re.sub('\\n{2,}', '\\n', ''.join(plain_sections)), end='')

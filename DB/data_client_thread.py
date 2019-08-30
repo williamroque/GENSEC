@@ -64,19 +64,22 @@ class DataClientThread(threading.Thread):
                 data_string = self.as_string()
                 if data_string:
                     f.write(data_string)
-                    self.connection.send(b'write_successful')
+                    self.send_encrypted('write_successful')
+                    self.connection.send(b'exit')
                     return True
                 else:
                     raise Exception('String empty.')
                 fcntl.flock(f, fcntl.LOCK_UN)
         except Exception as e:
-            self.connection.send(b'write_failed')
+            self.send_encrypted(b'write_failed')
+            self.connection.send(b'exit')
             return False
 
     def handle_mutate(self, callback, *args):
         callback(*args)
 
         write_successful = self.write()
+
         return write_successful
 
     def add(self, row, i = -1):

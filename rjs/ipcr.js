@@ -1,4 +1,4 @@
-const {
+const { 
     ipcRenderer,
     clipboard
 } = require('electron');
@@ -34,3 +34,7 @@ function requestUpdateSearchEnabled(searchEnabled) {
 function requestUpdateEditEnabled(editEnabled) {
     ipcRenderer.send('request-update-edit-enabled', editEnabled);
 }
+
+ipcRenderer.on('error', err => {
+    handleReturnCode(err);
+});

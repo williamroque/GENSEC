@@ -16,6 +16,10 @@ const deleteButton = document.querySelector('#delete-button');
 
 const searchButton = document.querySelector('#search-button');
 
+const overlayElem = document.querySelector('#overlay');
+
+let isConnected = false;
+
 let isUpdate = false;
 
 let virtualPath = [];
@@ -27,7 +31,6 @@ let dataFull = null;
 
 let isForm = false;
 
-// Whether the currently selected option is to filter, add/edit, or build
 const optionSelector = document.querySelector('#option-selector');
 
 let currentAction;
@@ -145,7 +148,16 @@ function renderObject(id, fileObject, actionOverride) {
     return formData;
 }
 
-function handleWriteCode(code) {
+function reconnect() {
+    const returnCode = ipcRenderer.sendSync('request-establish-connection');
+    handleReturnCode(returnCode);
+}
+
+function handleReturnCode(code) {
+    if (!overlayElem.classList.contains('overlay-hidden')) {
+        setTimeout(() => handleReturnCode(code), 300);
+        return;
+    }
     switch (code) {
         case 'write_failed':
             showMessagePrompt('Failed to write data.', 2500);
@@ -154,16 +166,25 @@ function handleWriteCode(code) {
             showMessagePrompt('Successfully wrote data.', 1600);
             break;
         case 'network_error':
-            showMessagePrompt('Unable to connect to server.', 2500);
+            showMessagePrompt('Unable to connect to server.', 10000);
+            isConnected = false;
+            setTimeout(reconnect, 5000);
             break;
         case 'network_timeout':
             showMessagePrompt('Connection timed out.', 2500);
+            isConnected = false;
+            setTimeout(reconnect, 5000);
+            break;
+        case 'connection_established':
+            showMessagePrompt('Connection established.', 1000);
+            isConnected = true;
             break;
         default:
             console.log('Invalid submit return code.');
-            return false;
     }
-    return true;
 }
+
+const returnCode = ipcRenderer.sendSync('request-establish-connection');
+handleReturnCode(returnCode);
 
 const getRelativeIndex = i => [...indexShifts].reduce((a, b) => i > b ? a - 1 : a, i);
