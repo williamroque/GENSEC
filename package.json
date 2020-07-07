@@ -24,7 +24,7 @@
   "author": "William Roque",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^4.1.4",
+    "electron": "^7.2.4",
     "electron-builder": "^20.40.2"
   },
   "dependencies": {
