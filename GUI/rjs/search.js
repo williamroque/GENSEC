@@ -1,8 +1,3 @@
-const {
-    clearNode,
-    Actions
-} = require('./dependencies');
-
 const searchPrompt = document.querySelector('#search-prompt');
 
 const searchInput = document.querySelector('#search-input');
@@ -11,8 +6,6 @@ const searchLabel = document.querySelector('#search-label');
 const currentSearchByButton = document.querySelector('#current-search-by');
 const searchByOptions = document.querySelectorAll('.search-by-option');
 const searchByOptionsWrapper = document.querySelector('#search-by-options-wrapper');
-
-const searchButton = document.querySelector('#search-button');
 
 let currentSearchBy;
 

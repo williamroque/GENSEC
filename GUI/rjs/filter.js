@@ -1,15 +1,3 @@
-const {
-    getRelativeIndex,
-    handleReturnCode,
-    render,
-    Actions
-} = require('./dependencies');
-
-const mutatePrompt = document.querySelector('#mutate-prompt');
-
-const editButton = document.querySelector('#edit-button');
-const deleteButton = document.querySelector('#delete-button');
-
 let promptVisible = false;
 
 function hideMutatePrompt() {

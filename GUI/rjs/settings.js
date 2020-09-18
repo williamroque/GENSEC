@@ -1,8 +1,3 @@
-const {
-    showMessagePrompt,
-    reconnect
-} = require('./dependencies');
-
 const settingsOptionButton = document.querySelector('#settings');
 const sidebarElement = document.querySelector('#sidebar');
 

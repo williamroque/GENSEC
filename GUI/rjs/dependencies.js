@@ -1,20 +1,60 @@
 const fs = require('fs');
 
+const index = 'forms/filesystem.json';
+const indexData = JSON.parse(fs.readFileSync(index)).filesystem;
+
+const navigationBar = document.querySelector('#navigate');
 const contentWrapper = document.querySelector('#main-content');
 
 const messagePrompt = document.querySelector('#message-prompt');
+const mutatePrompt = document.querySelector('#mutate-prompt');
+
+const editButton = document.querySelector('#edit-button');
+const deleteButton = document.querySelector('#delete-button');
+
+const searchButton = document.querySelector('#search-button');
 
 const overlayElem = document.querySelector('#overlay');
 
+let isConnected = false;
+
+let isUpdate = false;
+
+let virtualPath = [];
+let currentForm;
+
+let dataBody;
+
+let dataFull = null;
+
+let isForm = false;
+
 const optionSelector = document.querySelector('#option-selector');
 
-const Actions = {
+let currentAction;
+let currentActionElement;
+
+let Actions = {
     FILTER: 0,
     MUTATE: 1,
     CREATE: 2
 };
 
-// Relieve parent of obsolete children
+const buttonMargin = 60;
+
+let optionPosition;
+
+let indexShifts = new Set();
+
+let formIndex;
+
+let directoryList = document.createElement('UL');
+directoryList.setAttribute('id', 'directory-list');
+
+let pathData = indexData;
+
+let dom = {};
+
 function clearNode(node) {
     while (node.firstChild) {
         node.removeChild(node.firstChild);
@@ -24,6 +64,11 @@ function clearNode(node) {
 function render(content, wrapper) {
     clearNode(wrapper);
     wrapper.appendChild(content);
+}
+
+function parseData(data) {
+    let rows = data.split('\n');
+    return rows.map(row => row.split(';'));
 }
 
 const getFileObject = id => pathData.find(file => file.id === id);
@@ -133,15 +178,7 @@ function handleReturnCode(code) {
     }
 }
 
-const getRelativeIndex = i => [...indexShifts].reduce((a, b) => i > b ? a - 1 : a, i);
+const returnCode = ipcRenderer.sendSync('request-establish-connection');
+handleReturnCode(returnCode);
 
-module.exports = {
-    showMessagePrompt,
-    getRelativeIndex,
-    handleReturnCode,
-    reconnect,
-    clearNode,
-    renderObject,
-    render,
-    Actions
-};
+const getRelativeIndex = i => [...indexShifts].reduce((a, b) => i > b ? a - 1 : a, i);

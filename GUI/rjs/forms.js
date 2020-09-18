@@ -1,18 +1,6 @@
-const {
-    showMessagePrompt,
-    getRelativeIndex,
-    handleReturnCode,
-    renderObject,
-    render,
-    Actions
-} = require('./dependencies');
-
 const mutateOption = document.querySelector('#edit-contract');
 
 let currentlySelected;
-let isUpdate = false;
-
-let dom = {};
 
 function addInputClass(className, index, input) {
     input

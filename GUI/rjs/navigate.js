@@ -1,20 +1,3 @@
-const {
-    clearNode,
-    renderObject,
-    render,
-    Actions
-} = require('./dependencies');
-
-const navigationBar = document.querySelector('#navigate');
-const searchButton = document.querySelector('#search-button');
-
-const directoryList = document.createElement('UL');
-directoryList.setAttribute('id', 'directory-list');
-
-const getFileObject = id => pathData.find(file => file.id === id);
-
-let currentActionElement;
-
 function createList() {
     pathData.forEach(file => {
         const type = file.type;
@@ -48,11 +31,7 @@ function createList() {
                     pathData = fileObject.content;
                     update(true);
                 } else {
-                    if (isConnected) {
-                        renderObject(id, fileObject);
-                    } else {
-                        virtualPath.pop();
-                    }
+                    renderObject(id, fileObject);
                 }
             }
         }, false);
