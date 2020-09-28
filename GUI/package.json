@@ -24,10 +24,13 @@
   "author": "William Roque",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^4.1.4",
     "electron-builder": "^20.40.2"
   },
   "dependencies": {
-    "electron-window-state": "^5.0.3"
+    "electron": "^10.1.2",
+    "electron-settings": "^4.0.2",
+    "electron-window-state": "^5.0.3",
+    "rimraf": "^3.0.2",
+    "unzipper": "^0.10.11"
   }
 }

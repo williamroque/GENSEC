@@ -1,0 +1,244 @@
+.form {
+    width: 90%;
+    padding: 0 40px 90px 40px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+}
+
+.form-row {
+    width: 100%;
+    min-height: 40px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+}
+
+.form-cell {
+    height: 100%;
+    margin: 0;
+    padding: 5px;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.form-input {
+    width: 100%;
+    height: 25px;
+    outline: none;
+    box-sizing: border-box;
+    padding: 0 4px;
+    margin: 0;
+    border: none;
+    border-bottom: solid 1px #AAA;
+    font-size: 11pt;
+    color: #444;
+    transition-duration: .1s;
+}
+
+.form-input:focus,
+.form-input-active {
+    border-bottom-color: #C0B283 !important;
+    transition-duration: .1s !important;
+}
+
+.percentage-input {
+    padding-right: 15px;
+}
+
+.form-input-label {
+    position: absolute;
+    pointer-events: none;
+    color: #555;
+    font-family: helvetica;
+    font-size: 9pt;
+    text-transform: uppercase;
+    transform: translate(3px, 8px);
+    -webkit-user-select: none;
+    transition-duration: .1s;
+}
+
+.form-cell:focus-within .form-input-label,
+.form-input-label-active {
+    font-weight: bold;
+    font-size: 7pt;
+    color: #C0B283;
+    transform: translate(0, -8px);
+    transition-duration: .1s;
+}
+
+.percentage-symbol {
+    position: absolute;
+    transform: translate(-13px, 5px);
+    font-family: times;
+    font-size: 10pt;
+    color: #C0B283;
+    opacity: 0;
+    transition-duration: .1s;
+}
+
+.form-cell:focus-within .percentage-symbol,
+.percentage-symbol-active {
+    opacity: 1;
+    transition-duration: .1s;
+}
+
+.form-cell:focus-within .percentage-symbol,
+.percentage-symbol-active {
+    opacity: 1;
+    transition-duration: .1s;
+}
+
+.form-input-invalid {
+    border-bottom: solid 2px #966161 !important;
+}
+
+.form-input-label-invalid {
+    color: #9a4d4d;
+    font-weight: 600;
+}
+
+.percentage-symbol-invalid {
+    color: #7d5353;
+}
+
+.form-input[disabled] {
+    color: #797575;
+    border-bottom-color: #b5b5b5 !important;
+}
+
+.form-input-label[disabled] {
+    color: #8e8d8d !important;
+}
+
+.percentage-symbol[disabled] {
+    color: #908f8f;
+}
+
+.form-button {
+    width: 100%;
+    height: 45px;
+    border: solid 2px #C0B283;
+    background: none;
+    font-family: helvetica;
+    font-weight: 100;
+    text-transform: uppercase;
+    color: #C0B283;
+    font-size: 11pt;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.form-button:active {
+    background: #C0B283;
+    color: white;
+}
+
+.delete-button {
+    background: #C0B283;
+    border: none;
+    width: 30px;
+    height: 30px;
+    color: white;
+    font-size: 11pt;
+    outline: none;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.delete-button:active {
+    background: white;
+    border: solid 2px #C0B283;
+    color: #C0B283;
+    padding: 0;
+}
+
+.form-button:focus {
+    outline: solid 1px #bba046aa;
+    outline-offset: 2px;
+}
+
+.delete-button:focus {
+    outline: solid 2px #bba04677;
+    outline-offset: 1px;
+}
+
+.list-container {
+    width: 100%;
+    padding: 20px 10px;
+    box-sizing: border-box;
+    border: solid 1px #b7b5af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.list-items-container {
+    width: 100%;
+}
+
+.file-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px 0;
+    border: solid 1px #B7B5AF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: helvetica;
+    font-weight: 100;
+    text-transform: uppercase;
+    color: #b7b5af;
+    font-size: 10pt;
+    cursor: pointer;
+}
+
+.file-input-drag {
+    border: dashed 1px #9A9494 !important;
+    color: #777676;
+}
+
+.file-input-active {
+    border: solid 1px #C0B283;
+}
+
+.file-input-invalid {
+    border: solid 3px #8a5757;
+    color: #793f3f;
+    font-weight: 600;
+}
+
+.file-input-path-container {
+    margin: 10px 0;
+    border-bottom: solid 3px #C0B283;
+    padding-left: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 700px;
+    box-sizing: border-box;
+    cursor: default;
+}
+
+.file-input-path-text {
+    color: #C0B283;
+    font-weight: 500;
+    cursor: text;
+}
+
+.more-container {
+    margin-bottom: 17px;
+    line-height: 10px;
+    user-select: none;
+    cursor: pointer;
+}
+
+.more {
+    font-family: "arial black";
+    font-size: 13pt;
+    letter-spacing: .1em;
+    color: #ab8d29;
+}
