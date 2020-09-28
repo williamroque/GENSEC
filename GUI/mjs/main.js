@@ -130,7 +130,6 @@ const menuTemplate = [
                 click: () => {
                     const packagePath = Dialog.createOpenDialog([{ name: 'GENSEC Package', extensions: ['gpf'] }]);
 
-                    console.log(packagePath[0], systemPath);
                     if (packagePath) {
                         const filesystem = new Filesystem(systemPath);
                         filesystem.attemptInsertPackage(packagePath[0]).then(() => {

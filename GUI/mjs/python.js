@@ -12,21 +12,25 @@ class Python {
             minWidth: 400,
             minHeight: 600,
             show: false
-        }, 'error.html', false);
+        }, '../html/error.html', false);
+        errorWindow.createWindow();
 
         const progressWindow = new Window({
             width: 820,
             height: 700,
             minWidth: 400,
             minHeight: 600
-        }, 'progress.html', false);
+        }, '../html/progress.html', false);
+        progressWindow.createWindow();
     
         return new Promise(resolve => {
             progressWindow.addWebListener('did-finish-load', () => {
                 const subprocess = spawn('python', args.split(' '));
 
-                subprocess.stdin.write(JSON.stringify(input));
-                subprocess.stdin.end();
+                if (typeof input !== 'undefined') {
+                    subprocess.stdin.write(JSON.stringify(input));
+                    subprocess.stdin.end();
+                }
 
                 subprocess.stderr.on('data', err => {
                     errorWindow.show();

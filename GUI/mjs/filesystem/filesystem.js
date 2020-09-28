@@ -84,6 +84,7 @@ class Filesystem {
                         path.join(extractionPath, 'dist'),
                         targetPath
                     );
+                    rimraf.sync(extractionPath);
 
                     for (let i = 0; i < requirements.length; i++) {
                         await Python.pipInstall(requirements[i]);
