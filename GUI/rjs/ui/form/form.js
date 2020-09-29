@@ -5,7 +5,7 @@ const FileInput = require('./fileInput');
 const ValuesContainer = require('./valuesContainer');
 
 class Form extends ElementController {
-    constructor(schema, container) {
+    constructor(schema, container, settingsInstance) {
         super(
             'DIV', {
                 classList: new Set(['form'])
@@ -14,6 +14,8 @@ class Form extends ElementController {
 
         this.schema = schema;
         this.container = container;
+
+        this.settingsInstance = settingsInstance;
 
         this.valuesContainer = new ValuesContainer();
 
@@ -32,7 +34,8 @@ class Form extends ElementController {
                 for (const cellSchema of rowSchema.inputs) {
                     const inputCell = new Input(
                         this.valuesContainer,
-                        cellSchema
+                        cellSchema,
+                        this.settingsInstance
                     );
 
                     rowController.addChild(
@@ -44,7 +47,8 @@ class Form extends ElementController {
             } else if (rowSchema.type === 'list') {
                 const list = new List(
                     this.valuesContainer,
-                    rowSchema
+                    rowSchema,
+                    this.settingsInstance
                 );
 
                 rowController.addChild(list, rowSchema.id);
@@ -52,7 +56,8 @@ class Form extends ElementController {
                 const fileInput = new FileInput(
                     this.valuesContainer,
                     rowSchema,
-                    this
+                    this,
+                    this.settingsInstance
                 );
                 rowController.addChild(fileInput, rowSchema.id);
             }

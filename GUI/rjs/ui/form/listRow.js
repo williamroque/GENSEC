@@ -2,7 +2,7 @@ const ElementController = require('../elementController');
 const Input = require('./input');
 
 class ListRow extends ElementController {
-    constructor(valuesContainer, deleteCallback, listID, inputSchemata, index, incrementAnchors, calibrateIndicesCallback, data) {
+    constructor(valuesContainer, deleteCallback, listID, inputSchemata, index, incrementAnchors, calibrateIndicesCallback, data, settingsInstance) {
         super(
             'DIV', {
                 classList: new Set(['form-row'])
@@ -24,6 +24,8 @@ class ListRow extends ElementController {
         this.inputs = [];
         this.incrementInputs = {};
 
+        this.settingsInstance = settingsInstance;
+
         this.seedTree();
     }
 
@@ -38,6 +40,7 @@ class ListRow extends ElementController {
             const inputCell = new Input(
                 this.valuesContainer,
                 cellSchema,
+                this.settingsInstance,
                 this.listID,
                 this.setAnchor.bind(this),
                 (function() { return this._index }).bind(this)

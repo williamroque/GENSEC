@@ -4,7 +4,7 @@ const ElementController = require('../elementController');
 const InputValue = require('../inputValue');
 
 class Input extends ElementController {
-    constructor(valuesContainer, properties, listID, setAnchorCallback, getIndex) {
+    constructor(valuesContainer, properties, settingsInstance, listID, setAnchorCallback, getIndex) {
         super(
             'DIV', {
                 width: properties.width,
@@ -29,7 +29,7 @@ class Input extends ElementController {
 
         this.seedTree();
 
-        this.value = new InputValue('', this.type, this.setValidityClassCallback.bind(this));
+        this.value = new InputValue('', this.type, this.setValidityClassCallback.bind(this), settingsInstance);
     }
 
     seedTree() {

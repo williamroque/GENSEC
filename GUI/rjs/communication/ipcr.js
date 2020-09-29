@@ -6,6 +6,14 @@ class Communication {
         ipcRenderer.send('request-filesystem', path);
     }
 
+    static requestExecutePackage(programName, packageName, input) {
+        ipcRenderer.send('request-execute-package', programName, packageName, input);
+    }
+
+    static requestSaveDialog(extensions) {
+        return ipcRenderer.sendSync('request-save-dialog', extensions);
+    }
+
     static requestUpdateSearchEnabled(searchEnabled) {
         ipcRenderer.send('request-update-search-enabled', searchEnabled);
     }

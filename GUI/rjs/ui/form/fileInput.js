@@ -8,7 +8,7 @@ const FileInputRow = require('./fileInputRow');
 const InputValue = require('../inputValue');
 
 class FileInput extends ElementController {
-    constructor(valuesContainer, properties, parentNode) {
+    constructor(valuesContainer, properties, parentNode, settingsInstance) {
         super(
             'DIV', {
                 text: properties.label,
@@ -33,7 +33,7 @@ class FileInput extends ElementController {
         this.fileCount = 0;
         this.files = new Set();
 
-        this.value = new InputValue(this.files, 'filePaths', this.setValidityClassCallback.bind(this));
+        this.value = new InputValue(this.files, 'filePaths', this.setValidityClassCallback.bind(this), settingsInstance);
         this.valuesContainer.update(this.value, null, this.id);
     }
 
@@ -124,6 +124,7 @@ class FileInput extends ElementController {
                 const list = new List(
                     this.valuesContainer,
                     rowSchema,
+                    this.settingsInstance,
                     this.lists,
                     data
                 );

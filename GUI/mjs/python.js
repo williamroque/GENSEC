@@ -1,11 +1,9 @@
-const settings = require('electron-settings');
-
 const { spawn } = require('child_process');
 
 const Window = require('./browser/window');
 
 class Python {
-    static run(args, input) {
+    static run(args, input, dataWindowClosesOnFinish) {
         const errorWindow = new Window({
             width: 820,
             height: 700,
@@ -25,7 +23,7 @@ class Python {
     
         return new Promise(resolve => {
             progressWindow.addWebListener('did-finish-load', () => {
-                const subprocess = spawn('python', args.split(' '));
+                const subprocess = spawn('python', args);
 
                 if (typeof input !== 'undefined') {
                     subprocess.stdin.write(JSON.stringify(input));
@@ -41,8 +39,8 @@ class Python {
                     progressWindow.dispatchWebEvent('progress', data.toString());
                 });
 
-                subprocess.on('close', () => {
-                    if (settings.getSync('dataWindowClosesOnFinish')) {
+                subprocess.on('exit', () => {
+                    if (dataWindowClosesOnFinish) {
                         progressWindow.window.close();
                     }
                     resolve();
@@ -52,7 +50,7 @@ class Python {
     }
 
     static pipInstall(packageName) {
-        return Python.run(`-m pip install --disable-pip-version-check ${packageName}`)
+        return Python.run(`-m pip install --disable-pip-version-check ${packageName}`.split(' '), undefined, true);
     }
 }
 

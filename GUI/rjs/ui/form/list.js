@@ -3,7 +3,7 @@ const ListRow = require('./listRow');
 const Toggle = require('../toggle');
 
 class List extends ElementController {
-    constructor(valuesContainer, properties, syncedLists, data) {
+    constructor(valuesContainer, properties, settingsInstance, syncedLists, data) {
         super(
             'DIV', {
                 classList: new Set(['list-container'])
@@ -17,6 +17,8 @@ class List extends ElementController {
         this.inputs = properties.inputs;
         this.max = properties.max || Infinity;
         this.min = properties.min || 0;
+
+        this.settingsInstance = settingsInstance;
 
         this.syncedLists = syncedLists || [this];
 
@@ -112,7 +114,7 @@ class List extends ElementController {
 
     addRow(values) {
         if (Object.values(this.listController.DOMTree.children).length < this.max) {
-            const listRow = new ListRow(this.valuesContainer, this.deleteCallback.bind(this), this.id, this.inputs, this.listRows.length, this.incrementAnchors, this.calibrateIndices.bind(this), this.data);
+            const listRow = new ListRow(this.valuesContainer, this.deleteCallback.bind(this), this.id, this.inputs, this.listRows.length, this.incrementAnchors, this.calibrateIndices.bind(this), this.data, this.settingsInstance);
             this.listController.addChild(listRow);
             listRow.setFormValues(values);
 

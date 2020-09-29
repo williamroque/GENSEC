@@ -1,7 +1,8 @@
+const ElementController = require('../elementController');
 const InputValue = require('../inputValue');
 
-class SettingsInput {
-    constructor(entryContent, updateSettingCallback) {
+class SettingsInput extends ElementController {
+    constructor(entryContent, updateSettingCallback, settingsInstance) {
         super(
             'DIV', {
                 classList: new Set(['settings-input'])
@@ -17,7 +18,9 @@ class SettingsInput {
 
         this.value = new InputValue(
             entryContent.setting,
-            entryContent.type
+            entryContent.type,
+            null,
+            settingsInstance
         );
 
         this.seedTree();
@@ -26,21 +29,42 @@ class SettingsInput {
     }
 
     seedTree() {
-        const labelController = new ElementController(
-            'LABEL', {
-                text: this.label,
-                classList: new Set(['settings-input-label'])
-            }
-        );
-        this.addChild(labelController, 'label');
+        if (this.type === 'checkbox') {
+            const labelController = new ElementController(
+                'LABEL', {
+                    text: this.title,
+                    classList: new Set(['settings-checkbox-label'])
+                }
+            );
+            this.addChild(labelController, 'label');
 
-        const inputController = new ElementController(
-            'INPUT', {
-                classList: new Set(['settings-input'])
-            }
-        );
-        inputController.addEventListener('keydown', this.handleKeyEvent, this);
-        this.addChild(inputController, 'input');
+            const inputController = new ElementController(
+                'DIV', {
+                    classList: new Set(['settings-checkbox', 'icon'])
+                }
+            );
+            this.addChild(inputController, 'input');
+
+            this.addEventListener('click', function() {
+                this.setFieldValue(!this.value.content);
+            }, this);
+        } else {
+            const labelController = new ElementController(
+                'LABEL', {
+                    text: this.title,
+                    classList: new Set(['settings-text-label'])
+                }
+            );
+            this.addChild(labelController, 'label');
+
+            const inputController = new ElementController(
+                'INPUT', {
+                    classList: new Set(['settings-text-input'])
+                }
+            );
+            inputController.addEventListener('keydown', this.handleKeyEvent, this);
+            this.addChild(inputController, 'input');
+        }
     }
 
     updateField(key) {
@@ -79,15 +103,26 @@ class SettingsInput {
     }
 
     setFieldValue(value, range=[0, value.length]) {
-        const target = this.query('input').element;
-        let targetValue = target.value.split('');
+        const target = this.query('input');
 
-        targetValue.splice(range[0], range[1] - range[0], value);
-        targetValue = targetValue.join('');
+        let targetValue;
 
-        target.value = targetValue;
+        if (this.type === 'checkbox') {
+            targetValue = value;
+            target.DOMTree.text = value ? 'check_circle' : 'check_circle_outline';
+            target.render();
 
-        this.updateFormValue(targetValue);
+            this.updateSettingCallback(this.section, this.entry, value);
+        } else {
+            targetValue = target.element.value.split('');
+
+            targetValue.splice(range[0], range[1] - range[0], value);
+            targetValue = targetValue.join('');
+
+            target.element.value = targetValue;
+        }
+
+        this.value.update(targetValue);
 
         return targetValue;
     }
@@ -96,8 +131,8 @@ class SettingsInput {
         const inputNode = this.query('input');
         const labelNode = this.query('label');
 
-        const inputClass = 'settings-input-active';
-        const labelClass = 'settings-input-label-active';
+        const inputClass = 'settings-text-input-active';
+        const labelClass = 'settings-text-label-active';
 
         if (this.value.content !== '') {
             inputNode.addClass(inputClass);

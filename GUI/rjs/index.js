@@ -5,9 +5,14 @@ const Navigator = require('../rjs/ui/navigator/navigator');
 const Communication = require('../rjs/communication/ipcr');
 const Form = require('../rjs/ui/form/form');
 const ElementController = require('../rjs/ui/elementController');
+const Settings = require('../rjs/ui/settings/settings');
+
+const sidebar = document.querySelector('#sidebar');
 
 const mainContainer = document.querySelector('#main-wrapper');
 const settingsContainer = document.querySelector('#settings-wrapper');
+
+const settingsViewButton = document.querySelector('#show-settings-view');
 
 const tableViewButton = document.querySelector('#show-table-view');
 const editViewButton = document.querySelector('#show-edit-view');
@@ -31,7 +36,17 @@ buildViewButton.addEventListener('click', e => {
 
     Communication.requestFilesystem(systemPath, (_, system) => {
         navigator = new Navigator(system, mainContainer, manifest => {
-            const form = new Form(manifest, mainContainer);
+            const settings = new Settings(
+                manifest.defaultSettings,
+                settingsContainer,
+                settingsViewButton,
+                sidebar,
+                manifest.programName,
+                manifest.packageName
+            );
+            settings.activate();
+
+            const form = new Form(manifest, mainContainer, settings);
             form.activate();
 
             const buttonContainerController = new ElementController(
@@ -46,6 +61,7 @@ buildViewButton.addEventListener('click', e => {
                 }
             );
             voltarButtonController.addEventListener('click', navigator.activate, navigator);
+            voltarButtonController.addEventListener('click', settings.disableShowButton, settings);
             buttonContainerController.addChild(voltarButtonController);
 
             const spacerController = new ElementController(
@@ -64,7 +80,17 @@ buildViewButton.addEventListener('click', e => {
             executarButtonController.addEventListener('click', function(e) {
                 const values = form.valuesContainer;
                 if (values.areAllValid()) {
-                    console.log(values.parse(), form.schema);
+                    let input = values.parse();
+
+                    if ('allowedOutputExtensions' in manifest) {
+                        input['output-path'] = Communication.requestSaveDialog(manifest.allowedOutputExtensions);
+                    }
+
+                    Communication.requestExecutePackage(
+                        manifest.programName,
+                        manifest.packageName,
+                        input
+                    );
                 }
             }, this);
             buttonContainerController.addChild(executarButtonController);

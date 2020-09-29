@@ -1,3 +1,13 @@
+#show-settings-view {
+    position: absolute;
+    bottom: 30px;
+}
+
+.settings-button-disabled {
+    color: #746a4d;
+    cursor: default;
+}
+
 #settings-wrapper {
     position: absolute;
     top: 30px;
@@ -10,17 +20,25 @@
     left: 25px;
 }
 
-.settings-section-title {
+.settings-section-header {
     font-family: helvetica;
     font-size: 13pt;
     width: 100%;
     letter-spacing: .09em;
-    border-bottom: solid 2px #C0B283;
-    color: #C0B283;
-    margin-bottom: 35px;
+    border-bottom: solid 2px #5a5440;
+    color: #ab9e73;
+    margin: 30px 0 10px 0;
+    padding-left: 5px;
+    box-sizing: border-box;
 }
 
 .settings-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-text-input {
     width: 100%;
     background: transparent;
     color: #C0B283;
@@ -32,7 +50,7 @@
     box-sizing: border-box;
 }
 
-.settings-label {
+.settings-text-label {
     position: absolute;
     color: #999;
     font-size: 10pt;
@@ -40,13 +58,12 @@
     font-weight: 350;
 }
 
-.settings-input:focus, .settings-input-active {
+.settings-text-input:focus, .settings-text-input-active {
     border-bottom-color: #C0B283;
     transition-duration: .1s;
 }
 
-.settings-row:focus-within .settings-label,
-.settings-label-active {
+.settings-input:focus-within .settings-text-label, .settings-text-label-active {
     font-size: 8pt;
     font-weight: 800 !important;
     transform: translate(0, -13px);
@@ -54,26 +71,19 @@
     transition-duration: .1s;
 }
 
-#save-settings {
-    position: absolute;
-    bottom: 60px;
-    width: 100%;
-    height: 35px;
-    background: transparent;
-    border: none;
-    border: solid 1px #C0B283;
-    outline: none;
-    color: #C0B283;
-    font-family: helvetica;
-    font-size: 10pt;
-    font-weight: 600;
-    letter-spacing: .06em;
+.settings-checkbox {
+    font-size: 14pt;
+    text-align: center;
+    color: #716b56;
+    width: 20%;
     cursor: pointer;
 }
 
-#save-settings:active {
-    background: #C0B283;
-    color: #0A0A0A;
-    font-weight: 800 !important;
-    box-sizing: border-box;
+.settings-checkbox-label {
+    font-family: courier;
+    font-size: 10pt;
+    letter-spacing: -0.5px;
+    color: #8a8575;
+    width: 80%;
+    cursor: pointer;
 }
