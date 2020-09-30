@@ -26,7 +26,7 @@ html, body {
 }
 
 #toggle-prompt {
-    position: absolute;
+    position: fixed;
     font-family: helvetica;
     font-size: 11pt;
     letter-spacing: .07em;

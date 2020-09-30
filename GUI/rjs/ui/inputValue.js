@@ -1,6 +1,6 @@
 class InputValue {
     constructor(content, type, setValidityClassCallback, settings) {
-        const testFloat = s => settings.get('formulario', 'useDecimalDot') ?
+        const testFloat = s => settings.get('formulario', 'useDecimalDot').setting ?
             /^\d[\d,]*(\.\d+)?$/.test(s.trim()) :
             /^\d[\d\.]*(,\d+)?$/.test(s.trim());
         const datePattern = /^(Jan|Fev|Mar|Abr|Mai|Jun|Jul|Ago|Set|Out|Nov|Dez)\/\d{4}$/i;

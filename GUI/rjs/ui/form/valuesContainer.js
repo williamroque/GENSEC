@@ -2,8 +2,10 @@ const InputValue = require('../inputValue');
 const settings = require('electron-settings');
 
 class ValuesContainer {
-    constructor() {
+    constructor(settingsInstance) {
         this.values = {};
+
+        this.settingsInstance = settingsInstance;
     }
 
     update(value, group, id, index) {
@@ -75,7 +77,7 @@ class ValuesContainer {
 
     clean(value) {
         if (typeof value === 'string') {
-            if (settings.getSync('useDecimalDot')) {
+            if (this.settingsInstance.get('formulario', 'useDecimalDot').setting) {
                 value = value.replace(/,/g, '');
             } else {
                 value = value.replace(/\./g, '');

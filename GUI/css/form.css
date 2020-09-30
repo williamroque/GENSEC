@@ -106,6 +106,7 @@
 .form-input[disabled] {
     color: #797575;
     border-bottom-color: #b5b5b5 !important;
+    background: none;
 }
 
 .form-input-label[disabled] {

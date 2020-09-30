@@ -17,7 +17,7 @@ class Form extends ElementController {
 
         this.settingsInstance = settingsInstance;
 
-        this.valuesContainer = new ValuesContainer();
+        this.valuesContainer = new ValuesContainer(settingsInstance);
 
         this.seedTree();
     }

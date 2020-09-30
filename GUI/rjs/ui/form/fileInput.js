@@ -6,6 +6,7 @@ const {
 const ElementController = require('../elementController');
 const FileInputRow = require('./fileInputRow');
 const InputValue = require('../inputValue');
+const List = require('./list');
 
 class FileInput extends ElementController {
     constructor(valuesContainer, properties, parentNode, settingsInstance) {
@@ -18,6 +19,8 @@ class FileInput extends ElementController {
 
         this.valuesContainer = valuesContainer;
         this.parentNode = parentNode;
+
+        this.settingsInstance = settingsInstance;
 
         this.properties = properties;
 
