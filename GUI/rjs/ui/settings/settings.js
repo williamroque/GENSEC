@@ -14,8 +14,6 @@ class Settings extends ElementController {
         this.container = container;
         this.showButton = showButton;
 
-        this.sidebar = sidebar;
-
         this.programName = programName;
         this.packageName = packageName;
 
@@ -98,10 +96,6 @@ class Settings extends ElementController {
     activate() {
         this.clearContainer();
         this.container.appendChild(this.element);
-
-        this.showButton.addEventListener('click', () => {
-            this.sidebar.classList.toggle('sidebar-full');
-        }, false);
 
         this.enableShowButton();
     }

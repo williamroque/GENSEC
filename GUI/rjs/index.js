@@ -20,6 +20,10 @@ const buildViewButton = document.querySelector('#show-build-view');
 
 const systemPath = path.join(app.getPath('userData'), 'system');
 
+settingsViewButton.addEventListener('click', () => {
+    sidebar.classList.toggle('sidebar-full');
+}, false);
+
 let currentViewButton, navigator;
 
 function changeActiveButton(button) {
