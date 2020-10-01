@@ -31,7 +31,7 @@ class Navigator extends ElementController {
                 this.path.pop();
                 this.currentDirectory = this.system;
                 this.path.forEach(item => {
-                    this.currentDirectory = this.currentDirectory[item];
+                    this.currentDirectory = this.currentDirectory.files[item];
                 });
 
                 this.clearChildren();

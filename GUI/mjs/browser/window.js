@@ -64,7 +64,14 @@ class Window {
     }
 
     dispatchWebEvent(event, message) {
-        this.window.webContents.send(event, message);
+        if (this.isNull()) {
+            this.createWindow();
+            this.addWebListener('dom-ready', () => {
+                this.dispatchWebEvent(event, message);
+            });
+        } else {
+            this.window.webContents.send(event, message);
+        }
     }
 
     toggleDevTools() {

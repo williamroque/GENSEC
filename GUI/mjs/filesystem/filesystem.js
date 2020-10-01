@@ -26,10 +26,16 @@ class Filesystem {
             const itemPath = path.join(currentPath, item);
 
             if (item === 'manifest.json') {
-                system = {
-                    type: 'package',
-                    manifest: JSON.parse(fs.readFileSync(itemPath))
-                };
+                try {
+                    system = {
+                        type: 'package',
+                        manifest: JSON.parse(fs.readFileSync(itemPath))
+                    };
+                } catch(e) {
+                    console.log(e);
+
+                    return { type: 'directory', files: {} };
+                }
             } else if (/^[A-Za-z_ ]+$/.test(item)) {
                 system.files[item] = this.traverse(itemPath);
             }

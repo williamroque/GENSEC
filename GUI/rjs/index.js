@@ -88,6 +88,8 @@ buildViewButton.addEventListener('click', e => {
 
                     if ('allowedOutputExtensions' in manifest) {
                         input['output-path'] = Communication.requestSaveDialog(manifest.allowedOutputExtensions);
+
+                        if (!input['output-path']) return;
                     }
 
                     Communication.requestExecutePackage(
