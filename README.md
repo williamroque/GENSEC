@@ -1,3 +1,3 @@
 # GENSEC
 
-Gerenciador e gerador de contratos de operações de securitização.
+Gerador de relatórios de securitização.

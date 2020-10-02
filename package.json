@@ -18,18 +18,22 @@
   "scripts": {
     "start": "electron .",
     "dist-all": "electron-builder -mw",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "generate-certificate": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out gensec.pem -days 7 -nodes",
+    "mongo-dump": "mongodump -d gensec -o backup",
+    "mongo-restore": "mongorestore -d gensec backup"
   },
   "main": "./mjs/main.js",
   "author": "William Roque",
   "license": "ISC",
   "devDependencies": {
-    "electron-builder": "^20.40.2"
+    "electron-builder": "^20.40.2",
+    "electron": "^10.1.2"
   },
   "dependencies": {
-    "electron": "^10.1.2",
     "electron-settings": "^4.0.2",
     "electron-window-state": "^5.0.3",
+    "mongodb": "^3.6.2",
     "rimraf": "^3.0.2",
     "unzipper": "^0.10.11"
   }
