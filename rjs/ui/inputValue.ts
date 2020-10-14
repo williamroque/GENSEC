@@ -33,7 +33,10 @@ export default class InputValue {
             password: s => /^[A-Za-z_]+$/.test(s)
         };
 
-        this.content = content.trim();
+        this.content = content;
+        if (typeof this.content === 'string') {
+            this.content = this.content.trim();
+        }
 
         if (type in this.typeSystem) {
             this.type = type;
@@ -46,7 +49,9 @@ export default class InputValue {
     }
 
     update(value: any) {
-        this.content = value.trim();
+        if (typeof value === 'string') value = value.trim();
+
+        this.content = value;
     }
 
     test() {

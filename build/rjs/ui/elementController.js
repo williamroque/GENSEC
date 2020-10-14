@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class ElementController {
     constructor(type, properties) {
         this.DOMTree = Object.assign(Object.assign({ type: type }, properties), { children: {} });
@@ -21,6 +22,9 @@ class ElementController {
             this.render();
         }
     }
+    getChildren() {
+        return this.DOMTree.children;
+    }
     addChild(node, id) {
         if (typeof id === "undefined") {
             id = `unique-${this.childID++}`;
@@ -34,6 +38,10 @@ class ElementController {
         this.DOMTree.children[id].remove();
         delete this.DOMTree.children[id];
     }
+    setText(text) {
+        this.DOMTree.text = text;
+        this.render();
+    }
     toggleText() {
         this.rendersText = !this.rendersText;
         this.render();
@@ -46,7 +54,13 @@ class ElementController {
         return target ? target.query(id) : undefined;
     }
     addEventListener(event, callback, context) {
-        this.element.addEventListener(event, callback.bind(context), false);
+        var _a;
+        (_a = this.element) === null || _a === void 0 ? void 0 : _a.addEventListener(event, callback.bind(context), false);
+    }
+    clearChildren() {
+        Object.keys(this.DOMTree.children).forEach(childID => {
+            this.removeChild(childID);
+        });
     }
     render() {
         if (!this.element) {
@@ -73,7 +87,8 @@ class ElementController {
         }
     }
     remove() {
-        this.element.remove();
+        var _a;
+        (_a = this.element) === null || _a === void 0 ? void 0 : _a.remove();
     }
 }
-module.exports = ElementController;
+exports.default = ElementController;

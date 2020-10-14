@@ -1,9 +1,13 @@
 "use strict";
-const ElementController = require('../elementController');
-const ListRow = require('./listRow');
-const Toggle = require('../toggle');
-class List extends ElementController {
-    constructor(valuesContainer, properties, settingsInstance, syncedLists, data) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const elementController_1 = __importDefault(require("../elementController"));
+const listRow_1 = __importDefault(require("./listRow"));
+const toggle_1 = __importDefault(require("../toggle"));
+class List extends elementController_1.default {
+    constructor(valuesContainer, properties, settingsInstance, syncedLists, fileData) {
         super('DIV', {
             classList: new Set(['list-container'])
         });
@@ -15,24 +19,26 @@ class List extends ElementController {
         this.min = properties.min || 0;
         this.settingsInstance = settingsInstance;
         this.syncedLists = syncedLists || [this];
-        this.data = data;
+        this.fileData = fileData;
         this.showStateComplementLabel = 'Esconder';
         this.addEventListener('contextmenu', function (e) {
-            const button = new ElementController('BUTTON', {
+            const event = e;
+            const button = new elementController_1.default('BUTTON', {
                 classList: new Set(['toggle-button']),
                 'text': this.showStateComplementLabel
             });
             button.addEventListener('click', function () {
                 this.toggleListItemsVisibility();
             }, this);
-            Toggle.show([button], e.pageX, e.pageY);
+            toggle_1.default.show([button], event.pageX, event.pageY);
         }, this);
         this.listRows = [];
         this.incrementAnchors = {};
         this.seedTree();
     }
     calibrateIndices() {
-        this.syncedLists.forEach(syncedList => {
+        var _a;
+        (_a = this.syncedLists) === null || _a === void 0 ? void 0 : _a.forEach(syncedList => {
             syncedList.incrementAnchors = this.incrementAnchors;
             syncedList.listRows.forEach((listRow, i) => {
                 listRow.index = i;
@@ -40,10 +46,12 @@ class List extends ElementController {
         });
     }
     deleteCallback(i, id) {
+        var _a;
         if (this.listRows.length > this.min) {
-            this.syncedLists.forEach(syncedList => {
-                const listRow = syncedList.query('list-items-container').query(id);
-                syncedList.listController.removeChild(id);
+            (_a = this.syncedLists) === null || _a === void 0 ? void 0 : _a.forEach(syncedList => {
+                var _a, _b;
+                const listRow = (_a = syncedList.query('list-items-container')) === null || _a === void 0 ? void 0 : _a.query(id);
+                (_b = syncedList.listController) === null || _b === void 0 ? void 0 : _b.removeChild(id);
                 syncedList.listRows.splice(i, 1);
                 syncedList.calibrateIndices();
                 listRow.delete.call(listRow);
@@ -52,14 +60,14 @@ class List extends ElementController {
         }
     }
     seedTree() {
-        this.listController = new ElementController('DIV', {
+        this.listController = new elementController_1.default('DIV', {
             classList: new Set(['list-items-container'])
         });
         this.addChild(this.listController, 'list-items-container');
-        this.moreContainerController = new ElementController('DIV', {
+        this.moreContainerController = new elementController_1.default('DIV', {
             classList: new Set(['more-container', 'hidden'])
         });
-        const moreController = new ElementController('SPAN', {
+        const moreController = new elementController_1.default('SPAN', {
             classList: new Set(['more']),
             text: '...'
         });
@@ -68,7 +76,7 @@ class List extends ElementController {
             this.toggleListItemsVisibility();
         }, this);
         this.addChild(this.moreContainerController);
-        this.buttonController = new ElementController('BUTTON', {
+        this.buttonController = new elementController_1.default('BUTTON', {
             text: this.label,
             classList: new Set(['form-button'])
         });
@@ -81,25 +89,33 @@ class List extends ElementController {
         }
     }
     addRow(values) {
-        if (Object.values(this.listController.DOMTree.children).length < this.max) {
-            const listRow = new ListRow(this.valuesContainer, this.deleteCallback.bind(this), this.id, this.inputs, this.listRows.length, this.incrementAnchors, this.calibrateIndices.bind(this), this.data, this.settingsInstance);
-            this.listController.addChild(listRow);
-            listRow.setFormValues(values);
+        var _a, _b;
+        if (Object.values((_a = this.listController) === null || _a === void 0 ? void 0 : _a.getChildren()).length < this.max) {
+            const listRow = new listRow_1.default(this.valuesContainer, this.deleteCallback.bind(this), this.id, this.inputs, this.listRows.length, this.settingsInstance, this.incrementAnchors, this.calibrateIndices.bind(this), this.fileData);
+            (_b = this.listController) === null || _b === void 0 ? void 0 : _b.addChild(listRow);
+            if (typeof values !== 'undefined') {
+                listRow.setFormValues(values);
+            }
             this.listRows.push(listRow);
             this.calibrateIndices();
         }
     }
     toggleListItemsVisibility() {
+        var _a, _b, _c, _d;
         if (this.showStateComplementLabel === 'Esconder') {
-            this.listController.addClass('hidden');
-            this.moreContainerController.removeClass('hidden');
+            (_a = this.listController) === null || _a === void 0 ? void 0 : _a.addClass('hidden');
+            (_b = this.moreContainerController) === null || _b === void 0 ? void 0 : _b.removeClass('hidden');
             this.showStateComplementLabel = 'Mostrar';
         }
         else {
-            this.listController.removeClass('hidden');
-            this.moreContainerController.addClass('hidden');
+            (_c = this.listController) === null || _c === void 0 ? void 0 : _c.removeClass('hidden');
+            (_d = this.moreContainerController) === null || _d === void 0 ? void 0 : _d.addClass('hidden');
             this.showStateComplementLabel = 'Esconder';
         }
     }
+    remove() {
+        super.remove();
+        this.valuesContainer.removeFromAll(this.id);
+    }
 }
-module.exports = List;
+exports.default = List;

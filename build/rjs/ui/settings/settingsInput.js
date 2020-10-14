@@ -1,7 +1,12 @@
 "use strict";
-const ElementController = require('../elementController');
-const InputValue = require('../inputValue');
-class SettingsInput extends ElementController {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const electron_1 = require("electron");
+const elementController_1 = __importDefault(require("../elementController"));
+const inputValue_1 = __importDefault(require("../inputValue"));
+class SettingsInput extends elementController_1.default {
     constructor(entryContent, updateSettingCallback, settingsInstance) {
         super('DIV', {
             classList: new Set(['settings-input'])
@@ -11,18 +16,18 @@ class SettingsInput extends ElementController {
         this.section = entryContent.section;
         this.entry = entryContent.entry;
         this.updateSettingCallback = updateSettingCallback;
-        this.value = new InputValue(entryContent.setting, entryContent.type, null, settingsInstance);
+        this.value = new inputValue_1.default(entryContent.setting, entryContent.type, null, settingsInstance);
         this.seedTree();
         this.setFieldValue(entryContent.setting);
     }
     seedTree() {
         if (this.type === 'checkbox') {
-            const labelController = new ElementController('LABEL', {
+            const labelController = new elementController_1.default('LABEL', {
                 text: this.title,
                 classList: new Set(['settings-checkbox-label'])
             });
             this.addChild(labelController, 'label');
-            const inputController = new ElementController('DIV', {
+            const inputController = new elementController_1.default('DIV', {
                 classList: new Set(['settings-checkbox', 'icon'])
             });
             this.addChild(inputController, 'input');
@@ -31,12 +36,12 @@ class SettingsInput extends ElementController {
             }, this);
         }
         else {
-            const labelController = new ElementController('LABEL', {
+            const labelController = new elementController_1.default('LABEL', {
                 text: this.title,
                 classList: new Set(['settings-text-label'])
             });
             this.addChild(labelController, 'label');
-            const inputController = new ElementController('INPUT', {
+            const inputController = new elementController_1.default('INPUT', {
                 classList: new Set(['settings-text-input'])
             });
             inputController.element.setAttribute('spellcheck', 'false');
@@ -45,7 +50,8 @@ class SettingsInput extends ElementController {
         }
     }
     updateField(key) {
-        const target = this.query('input').element;
+        var _a;
+        const target = (_a = this.query('input')) === null || _a === void 0 ? void 0 : _a.element;
         const selStart = target.selectionStart;
         const selEnd = target.selectionEnd;
         const selLength = selEnd - selStart;
@@ -77,33 +83,36 @@ class SettingsInput extends ElementController {
         this.setValidityClass(isValid);
         return targetValue;
     }
-    setFieldValue(value, range = [0, value.length]) {
+    setFieldValue(value, range) {
         const target = this.query('input');
+        const targetElement = target.element;
         let targetValue;
         if (this.type === 'checkbox') {
             targetValue = value;
-            target.DOMTree.text = value ? 'check_circle' : 'check_circle_outline';
-            target.render();
+            target.setText(value ? 'check_circle' : 'check_circle_outline');
             this.updateSettingCallback(this.section, this.entry, value);
         }
         else {
+            value = value;
+            if (typeof range === 'undefined')
+                range = [0, value.length];
             if (this.type === 'password') {
                 if (value === '') {
                     targetValue = this.value.content.split('');
                     targetValue.splice(range[0], range[1] - range[0], '');
                     targetValue = targetValue.join('');
-                    target.element.value = '•'.repeat(targetValue.length);
+                    targetElement.value = '•'.repeat(targetValue.length);
                 }
                 else {
                     targetValue = range[1] - range[0] === value.length ? value : this.value.content + value;
-                    target.element.value += '•'.repeat(value.length);
+                    targetElement.value += '•'.repeat(value.length);
                 }
             }
             else {
-                targetValue = target.element.value.split('');
+                targetValue = targetElement.value.split('');
                 targetValue.splice(range[0], range[1] - range[0], value);
                 targetValue = targetValue.join('');
-                target.element.value = targetValue;
+                targetElement.value = targetValue;
             }
         }
         console.log(targetValue);
@@ -140,28 +149,26 @@ class SettingsInput extends ElementController {
         }
     }
     handleKeyEvent(e) {
-        if (e.key.length === 1 && !e.metaKey && !e.ctrlKey || e.key === 'Backspace') {
-            this.updateField(e.key);
-            e.preventDefault();
+        var _a;
+        const event = e;
+        if (event.key.length === 1 && !event.metaKey && !event.ctrlKey || event.key === 'Backspace') {
+            this.updateField(event.key);
+            event.preventDefault();
         }
         else {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'v') {
-                const target = this.query('input').element;
-                const selStart = target.selectionStart;
-                const selEnd = target.selectionEnd;
-                const text = clipboard.readText();
+            const target = (_a = this.query('input')) === null || _a === void 0 ? void 0 : _a.element;
+            const selStart = target.selectionStart;
+            const selEnd = target.selectionEnd;
+            if ((event.metaKey || event.ctrlKey) && event.key === 'v') {
+                const text = electron_1.clipboard.readText();
                 this.setFieldValue(text, [selStart, selEnd]);
                 target.setSelectionRange(selStart + text.length, selStart + text.length);
             }
-            else if ((e.metaKey || e.ctrlKey) && e.key === 'x') {
-                const target = this.query('input').element;
-                const selStart = target.selectionStart;
-                const selEnd = target.selectionEnd;
-                clipboard.writeText(target.value.slice(selStart, selEnd));
-                this.updateField(false, '');
+            else if ((event.metaKey || event.ctrlKey) && event.key === 'x') {
+                electron_1.clipboard.writeText(target.value.slice(selStart, selEnd));
+                this.updateField('');
             }
         }
-        console.log(this.value.content);
     }
 }
-module.exports = SettingsInput;
+exports.default = SettingsInput;

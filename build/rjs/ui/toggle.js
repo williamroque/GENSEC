@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const togglePrompt = document.querySelector('#toggle-prompt');
 class Toggle {
     static clearPrompt() {
@@ -29,7 +30,7 @@ class Toggle {
         togglePrompt.classList.add('hidden');
     }
 }
-module.exports = Toggle;
+exports.default = Toggle;
 window.addEventListener('click', () => Toggle.hide(), false);
 window.addEventListener('keydown', e => {
     if (e.key === 'Escape') {

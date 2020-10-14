@@ -1,49 +1,55 @@
 "use strict";
-const { MongoClient } = require('mongodb');
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongodb_1 = require("mongodb");
 class Connection {
     constructor(dbName, host, port, username, password, certificatePath) {
         const url = `mongodb://${username}:${password}@${host}:${port}/?tls=true`;
         this.dbName = dbName;
-        this._client = new MongoClient(url, {
+        this.client = new mongodb_1.MongoClient(url, {
             tlsCAFile: certificatePath,
             rejectUnauthorized: false
         });
     }
     connect() {
         return new Promise((resolve, reject) => {
-            this._client.connect((err, res) => {
+            this.client.connect((err, res) => {
                 if (err) {
                     reject(err);
                 }
                 else {
-                    this._db = this._client.db(this.dbName);
+                    this.db = this.client.db(this.dbName);
                     resolve(res);
                 }
             });
         });
     }
     insertDocuments(documents, collectionName, callback) {
-        const collection = this._db.collection(collectionName);
-        collection.insertMany(documents, callback);
+        var _a;
+        const collection = (_a = this.db) === null || _a === void 0 ? void 0 : _a.collection(collectionName);
+        collection === null || collection === void 0 ? void 0 : collection.insertMany(documents, callback);
     }
     getAll(collectionName, callback) {
-        const collection = this._db.collection(collectionName);
-        collection.find({}).toArray(callback);
+        var _a;
+        const collection = (_a = this.db) === null || _a === void 0 ? void 0 : _a.collection(collectionName);
+        collection === null || collection === void 0 ? void 0 : collection.find({}).toArray(callback);
     }
     get(query, collectionName, callback) {
-        const collection = this._db.collection(collectionName);
-        collection.find(query).toArray(callback);
+        var _a;
+        const collection = (_a = this.db) === null || _a === void 0 ? void 0 : _a.collection(collectionName);
+        collection === null || collection === void 0 ? void 0 : collection.find(query).toArray(callback);
     }
     update(query, target, collectionName, callback) {
-        const collection = this._db.collection(collectionName);
-        collection.updateOne(query, { $set: target }, callback);
+        var _a;
+        const collection = (_a = this.db) === null || _a === void 0 ? void 0 : _a.collection(collectionName);
+        collection === null || collection === void 0 ? void 0 : collection.updateOne(query, { $set: target }, callback);
     }
     remove(query, collectionName, callback) {
-        const collection = this._db.collection(collectionName);
-        collection.deleteOne(query, callback);
+        var _a;
+        const collection = (_a = this.db) === null || _a === void 0 ? void 0 : _a.collection(collectionName);
+        collection === null || collection === void 0 ? void 0 : collection.deleteOne(query, callback);
     }
     close() {
-        this._client.close();
+        this.client.close();
     }
 }
-module.exports = Connection;
+exports.default = Connection;

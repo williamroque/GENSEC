@@ -1,10 +1,14 @@
 "use strict";
-const ElementController = require('../elementController');
-const Input = require('./input');
-const List = require('./list');
-const FileInput = require('./fileInput');
-const ValuesContainer = require('./valuesContainer');
-class Form extends ElementController {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const elementController_1 = __importDefault(require("../elementController"));
+const input_1 = __importDefault(require("./input"));
+const list_1 = __importDefault(require("./list"));
+const fileInput_1 = __importDefault(require("./fileInput"));
+const valuesContainer_1 = __importDefault(require("./valuesContainer"));
+class Form extends elementController_1.default {
     constructor(schema, container, settingsInstance) {
         super('DIV', {
             classList: new Set(['form'])
@@ -12,27 +16,27 @@ class Form extends ElementController {
         this.schema = schema;
         this.container = container;
         this.settingsInstance = settingsInstance;
-        this.valuesContainer = new ValuesContainer(settingsInstance);
+        this.valuesContainer = new valuesContainer_1.default(settingsInstance);
         this.seedTree();
     }
     seedTree() {
         for (const rowSchema of this.schema.form) {
-            const rowController = new ElementController('DIV', {
+            const rowController = new elementController_1.default('DIV', {
                 classList: new Set(['form-row'])
             });
             if (rowSchema.type === 'input-row') {
                 for (const cellSchema of rowSchema.inputs) {
-                    const inputCell = new Input(this.valuesContainer, cellSchema, this.settingsInstance);
+                    const inputCell = new input_1.default(this.valuesContainer, cellSchema, this.settingsInstance);
                     rowController.addChild(inputCell, (cellSchema.group ? `${cellSchema.group}=` : '') + cellSchema.id);
                     inputCell.updateFormValue('');
                 }
             }
             else if (rowSchema.type === 'list') {
-                const list = new List(this.valuesContainer, rowSchema, this.settingsInstance);
+                const list = new list_1.default(this.valuesContainer, rowSchema, this.settingsInstance);
                 rowController.addChild(list, rowSchema.id);
             }
             else if (rowSchema.type === 'file-input') {
-                const fileInput = new FileInput(this.valuesContainer, rowSchema, this, this.settingsInstance);
+                const fileInput = new fileInput_1.default(this.valuesContainer, rowSchema, this, this.settingsInstance);
                 rowController.addChild(fileInput, rowSchema.id);
             }
             this.addChild(rowController);
@@ -49,4 +53,4 @@ class Form extends ElementController {
         this.container.appendChild(this.element);
     }
 }
-module.exports = Form;
+exports.default = Form;

@@ -1,24 +1,21 @@
 "use strict";
-const { dialog } = require('electron');
-
-export default class Dialog {
+Object.defineProperty(exports, "__esModule", { value: true });
+const electron_1 = require("electron");
+class Dialog {
     static createSaveDialog(filters) {
-        return dialog.showSaveDialogSync({
-            properties: ['openFile'],
+        return electron_1.dialog.showSaveDialogSync({
+            properties: [],
             filters: filters
         });
     }
     static createOpenDialog(filters) {
-        return dialog.showOpenDialogSync({
-            properties: ['openFile'],
+        return electron_1.dialog.showOpenDialogSync({
+            properties: [],
             filters: filters
         });
     }
-    static showError(title, content) {
-        dialog.showErrorBox(title, content);
-    }
     static ask(question) {
-        const answer = dialog.showMessageBoxSync({
+        const answer = electron_1.dialog.showMessageBoxSync({
             message: question,
             buttons: ['Sim', 'Não'],
             cancelId: 1
@@ -26,3 +23,4 @@ export default class Dialog {
         return answer === 0;
     }
 }
+exports.default = Dialog;

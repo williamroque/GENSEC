@@ -1,7 +1,11 @@
 "use strict";
-const ElementController = require('../elementController');
-const TableCell = require('./tableCell');
-class Table extends ElementController {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const elementController_1 = __importDefault(require("../elementController"));
+const tableCell_1 = __importDefault(require("./tableCell"));
+class Table extends elementController_1.default {
     constructor(data, headers, container) {
         super('TABLE', {
             classList: new Set(['data-table'])
@@ -12,11 +16,11 @@ class Table extends ElementController {
         this.seedTree();
     }
     seedTree() {
-        const headerRowController = new ElementController('TR', {
+        const headerRowController = new elementController_1.default('TR', {
             classList: new Set(['data-table-header-row'])
         });
         for (const header of this.headers) {
-            const headerCellController = new ElementController('TH', {
+            const headerCellController = new elementController_1.default('TH', {
                 text: header,
                 classList: new Set(['data-table-header-cell'])
             });
@@ -24,11 +28,11 @@ class Table extends ElementController {
         }
         this.addChild(headerRowController);
         for (const dataRow of this.data) {
-            const rowController = new ElementController('TR', {
+            const rowController = new elementController_1.default('TR', {
                 classList: new Set(['data-table-row'])
             });
             for (const dataCell of dataRow) {
-                const tableCell = new TableCell(dataCell);
+                const tableCell = new tableCell_1.default(dataCell);
                 rowController.addChild(tableCell);
             }
             this.addChild(rowController);
@@ -45,4 +49,4 @@ class Table extends ElementController {
         this.container.appendChild(this.element);
     }
 }
-module.exports = Table;
+exports.default = Table;

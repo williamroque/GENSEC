@@ -1,9 +1,13 @@
 "use strict";
-const settings = require('electron-settings');
-const ElementController = require('../elementController');
-const SettingsInput = require('./settingsInput');
-class Settings extends ElementController {
-    constructor(defaults, container, showButton, sidebar, programName, packageName) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const electron_settings_1 = __importDefault(require("electron-settings"));
+const elementController_1 = __importDefault(require("../elementController"));
+const settingsInput_1 = __importDefault(require("./settingsInput"));
+class Settings extends elementController_1.default {
+    constructor(defaults, container, showButton, programName, packageName) {
         super('DIV', {
             classList: new Set(['settings'])
         });
@@ -11,44 +15,43 @@ class Settings extends ElementController {
         this.showButton = showButton;
         this.programName = programName;
         this.packageName = packageName;
-        this.setDefaults(defaults);
+        this.settings = defaults;
         this.seedTree();
     }
     seedTree() {
         for (const [section, sectionContent] of Object.entries(this.settings)) {
-            const headerController = new ElementController('H1', {
+            const headerController = new elementController_1.default('H1', {
                 text: sectionContent.title,
                 classList: new Set(['settings-section-header'])
             });
             this.addChild(headerController);
             for (let [entry, entryContent] of Object.entries(sectionContent.entries)) {
                 entryContent = Object.assign(Object.assign({}, entryContent), { section: section, entry: entry });
-                const inputController = new SettingsInput(entryContent, this.set.bind(this), this);
+                const inputController = new settingsInput_1.default(entryContent, this.set.bind(this), this);
                 this.addChild(inputController, entry);
             }
         }
     }
-    setDefaults(defaults) {
-        this.settings = defaults;
-        if (!settings.hasSync(this.programName)) {
-            settings.setSync(this.programName, {});
+    setDefaults() {
+        if (!electron_settings_1.default.hasSync(this.programName)) {
+            electron_settings_1.default.setSync(this.programName, {});
         }
-        if (!settings.hasSync([this.programName, this.packageName])) {
-            settings.setSync([this.programName, this.packageName], this.settings);
+        if (!electron_settings_1.default.hasSync([this.programName, this.packageName])) {
+            electron_settings_1.default.setSync([this.programName, this.packageName], this.settings);
         }
         for (const [section, sectionContent] of Object.entries(this.settings)) {
             const sectionPath = [this.programName, this.packageName, section];
-            if (!settings.hasSync(sectionPath)) {
-                settings.setSync(sectionPath, sectionContent);
+            if (!electron_settings_1.default.hasSync(sectionPath)) {
+                electron_settings_1.default.setSync(sectionPath, sectionContent);
             }
             else {
                 for (const [entry, entryContent] of Object.entries(sectionContent.entries)) {
                     const entryPath = sectionPath.concat(['entries', entry]);
-                    if (settings.hasSync(entryPath)) {
-                        this.settings[section].entries[entry] = settings.getSync(entryPath, entry);
+                    if (electron_settings_1.default.hasSync(entryPath)) {
+                        this.settings[section].entries[entry] = electron_settings_1.default.getSync(entryPath);
                     }
                     else {
-                        settings.setSync(entryPath, entryContent);
+                        electron_settings_1.default.setSync(entryPath, entryContent);
                     }
                 }
             }
@@ -59,7 +62,7 @@ class Settings extends ElementController {
     }
     set(section, entry, setting) {
         this.settings[section].entries[entry].setting = setting;
-        settings.setSync([this.programName, this.packageName, section, 'entries', entry, 'setting'], setting);
+        electron_settings_1.default.setSync([this.programName, this.packageName, section, 'entries', entry, 'setting'], setting);
     }
     clearContainer() {
         let child;
@@ -81,4 +84,4 @@ class Settings extends ElementController {
         this.showButton.disabled = true;
     }
 }
-module.exports = Settings;
+exports.default = Settings;

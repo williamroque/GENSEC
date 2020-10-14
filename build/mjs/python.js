@@ -1,10 +1,13 @@
 "use strict";
-const { spawn } = require('child_process');
-const Window = require('./browser/window');
-
-export default class Python {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const child_process_1 = require("child_process");
+const window_1 = __importDefault(require("./browser/window"));
+class Python {
     static run(args, input, dataWindowClosesOnFinish) {
-        const errorWindow = new Window({
+        const errorWindow = new window_1.default({
             width: 820,
             height: 700,
             minWidth: 400,
@@ -12,7 +15,7 @@ export default class Python {
             show: false
         }, '../html/error.html', false);
         errorWindow.createWindow();
-        const progressWindow = new Window({
+        const progressWindow = new window_1.default({
             width: 820,
             height: 700,
             minWidth: 400,
@@ -21,8 +24,8 @@ export default class Python {
         progressWindow.createWindow();
         return new Promise(resolve => {
             progressWindow.addWebListener('did-finish-load', () => {
-                const subprocess = spawn('python', args);
-                if (typeof input !== 'undefined') {
+                const subprocess = child_process_1.spawn('python', args);
+                if (input !== null) {
                     subprocess.stdin.write(JSON.stringify(input));
                     subprocess.stdin.end();
                 }
@@ -34,8 +37,9 @@ export default class Python {
                     progressWindow.dispatchWebEvent('progress', data.toString());
                 });
                 subprocess.on('exit', () => {
+                    var _a;
                     if (dataWindowClosesOnFinish) {
-                        progressWindow.window.close();
+                        (_a = progressWindow.window) === null || _a === void 0 ? void 0 : _a.close();
                     }
                     resolve();
                 });
@@ -43,6 +47,7 @@ export default class Python {
         });
     }
     static pipInstall(packageName) {
-        return Python.run(`-m pip install --disable-pip-version-check ${packageName}`.split(' '), undefined, true);
+        return Python.run(`-m pip install --disable-pip-version-check ${packageName}`.split(' '), null, true);
     }
 }
+exports.default = Python;

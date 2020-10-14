@@ -1,12 +1,36 @@
 "use strict";
-const { app } = require('electron').remote;
-const path = require('path');
-const Navigator = require('../rjs/ui/navigator/navigator');
-const Communication = require('../rjs/communication/ipcr');
-const Form = require('../rjs/ui/form/form');
-const ElementController = require('../rjs/ui/elementController');
-const Settings = require('../rjs/ui/settings/settings');
-const Connection = require('../rjs/communication/connection');
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const electron_1 = require("electron");
+const { app } = electron_1.remote;
+const path = __importStar(require("path"));
+const navigator_1 = __importDefault(require("../rjs/ui/navigator/navigator"));
+const ipcr_1 = __importDefault(require("../rjs/communication/ipcr"));
+const form_1 = __importDefault(require("../rjs/ui/form/form"));
+const elementController_1 = __importDefault(require("../rjs/ui/elementController"));
+const settings_1 = __importDefault(require("../rjs/ui/settings/settings"));
+const connection_1 = __importDefault(require("../rjs/communication/connection"));
 const sidebar = document.querySelector('#sidebar');
 const mainContainer = document.querySelector('#main-wrapper');
 const settingsContainer = document.querySelector('#settings-wrapper');
@@ -19,7 +43,9 @@ const systemPath = path.join(appDataPath, 'system');
 settingsViewButton.addEventListener('click', () => {
     sidebar.classList.toggle('sidebar-full');
 }, false);
-let currentViewButton, navigatorController, settings;
+let currentViewButton;
+let navigationController;
+let settings;
 function changeActiveButton(button) {
     if (currentViewButton) {
         currentViewButton.classList.remove('view-button-active');
@@ -27,64 +53,66 @@ function changeActiveButton(button) {
     button.classList.add('view-button-active');
     currentViewButton = button;
 }
-buildViewButton.addEventListener('click', e => {
+buildViewButton.addEventListener('click', () => {
     changeActiveButton(buildViewButton);
     if (typeof settings !== 'undefined') {
         settings.disableShowButton();
     }
-    Communication.requestFilesystem(systemPath).then(system => {
-        navigatorController = new Navigator(system, mainContainer, manifest => {
-            settings = new Settings(manifest.defaultSettings, settingsContainer, settingsViewButton, sidebar, manifest.programName, manifest.packageName);
+    ipcr_1.default.requestFilesystem(systemPath).then(system => {
+        navigationController = new navigator_1.default(system, mainContainer, (manifest) => {
+            if (typeof manifest === 'undefined')
+                return;
+            settings = new settings_1.default(manifest.defaultSettings, settingsContainer, settingsViewButton, manifest.programName, manifest.packageName);
             settings.activate();
-            const form = new Form(manifest, mainContainer, settings);
+            const form = new form_1.default(manifest, mainContainer, settings);
             form.activate();
-            const buttonContainerController = new ElementController('DIV', {
+            const buttonContainerController = new elementController_1.default('DIV', {
                 classList: new Set(['action-button-container'])
             });
-            const voltarButtonController = new ElementController('BUTTON', {
+            const voltarButtonController = new elementController_1.default('BUTTON', {
                 text: 'Voltar',
                 classList: new Set(['form-button', 'action-button'])
             });
-            voltarButtonController.addEventListener('click', navigatorController.activate, navigatorController);
+            voltarButtonController.addEventListener('click', navigationController.activate, navigationController);
             voltarButtonController.addEventListener('click', settings.disableShowButton, settings);
             buttonContainerController.addChild(voltarButtonController);
-            const spacerController = new ElementController('DIV', {
+            const spacerController = new elementController_1.default('DIV', {
                 classList: new Set(['spacer'])
             });
             buttonContainerController.addChild(spacerController);
-            const executarButtonController = new ElementController('BUTTON', {
+            const executarButtonController = new elementController_1.default('BUTTON', {
                 text: 'Executar',
                 classList: new Set(['form-button', 'action-button'])
             });
-            executarButtonController.addEventListener('click', function (e) {
+            executarButtonController.addEventListener('click', function () {
                 const values = form.valuesContainer;
                 if (values.areAllValid()) {
                     let input = values.parse();
                     if ('allowedOutputExtensions' in manifest) {
-                        input['output-path'] = Communication.requestSaveDialog(manifest.allowedOutputExtensions);
+                        input['output-path'] = ipcr_1.default.requestSaveDialog(manifest.allowedOutputExtensions);
                         if (!input['output-path'])
                             return;
                     }
-                    Communication.requestExecutePackage(manifest.programName, manifest.packageName, input);
+                    ipcr_1.default.requestExecutePackage(manifest.programName, manifest.packageName, input);
                 }
             }, this);
             buttonContainerController.addChild(executarButtonController);
             form.addChild(buttonContainerController);
         });
-        navigatorController.activate();
+        navigationController.activate();
     });
 }, false);
-editViewButton.addEventListener('click', e => {
+editViewButton.addEventListener('click', () => {
     changeActiveButton(editViewButton);
     if (typeof settings !== 'undefined') {
         settings.disableShowButton();
     }
-    Communication.requestFilesystem(systemPath, ['requiresDatabaseAccess', true]).then((_, system) => {
-        navigatorController = new Navigator(system, mainContainer, manifest => {
-            settings = new Settings(manifest.defaultSettings, settingsContainer, settingsViewButton, sidebar, manifest.programName, manifest.packageName);
+    ipcr_1.default.requestFilesystem(systemPath, ['requiresDatabaseAccess', true]).then(system => {
+        navigationController = new navigator_1.default(system, mainContainer, (manifest) => {
+            settings = new settings_1.default(manifest.defaultSettings, settingsContainer, settingsViewButton, manifest.programName, manifest.packageName);
             settings.activate();
             try {
-                const connection = new Connection(manifest.programName, settings.get('network', 'ip'), settings.get('network', 'port'), settings.get('credentials', 'username'), settings.get('credentials', 'password'), certificatePath);
+                const connection = new connection_1.default(manifest.programName, settings.get('network', 'ip').setting, settings.get('network', 'port').setting, settings.get('credentials', 'username').setting, settings.get('credentials', 'password').setting, certificatePath);
                 connection.connect().then(() => {
                     connection.getAll(manifest.packageName, data => {
                         console.log(data);
@@ -111,9 +139,9 @@ editViewButton.addEventListener('click', e => {
                 });
             }
             catch (err) {
-                Communication.requestDisplayErrorWindow(err);
+                ipcr_1.default.requestDisplayErrorWindow(err);
             }
         });
-        navigatorController.activate();
+        navigationController.activate();
     });
 });

@@ -1,13 +1,16 @@
 "use strict";
-const InputValue = require('../inputValue');
-const settings = require('electron-settings');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const inputValue_1 = __importDefault(require("../inputValue"));
 class ValuesContainer {
     constructor(settingsInstance) {
         this.values = {};
         this.settingsInstance = settingsInstance;
     }
-    update(value, group, id, index) {
-        if (group) {
+    update(value, id, group, index) {
+        if (typeof group !== 'undefined') {
             if (!(group in this.values)) {
                 this.values[group] = {};
             }
@@ -34,28 +37,33 @@ class ValuesContainer {
         }
     }
     removeAtIndex(group, id, index) {
-        if (group && group in this.values) {
-            if (id in this.values[group] &&
-                Array.isArray(this.values[group][id])) {
+        if (group in this.values) {
+            if (id in this.values[group] && Array.isArray(this.values[group][id])) {
                 this.values[group][id].splice(index, 1);
             }
         }
         else {
-            if (id in this.values &&
-                Array.isArray(this.values[id])) {
+            if (id in this.values && Array.isArray(this.values[id])) {
                 this.values[id].splice(index, 1);
             }
         }
     }
+    removeFromAll(id) {
+        for (const [group, values] of Object.entries(this.values)) {
+            if (id in values)
+                delete this.values[group][id];
+        }
+    }
     areAllValid(obj = this.values) {
+        var _a;
         let areValid = true;
         for (const value of Object.values(obj)) {
-            if (value instanceof InputValue) {
+            if (value instanceof inputValue_1.default) {
                 const isValid = value.test();
                 if (!isValid) {
                     areValid = false;
                 }
-                value.setValidityClassCallback(isValid);
+                (_a = value.setValidityClassCallback) === null || _a === void 0 ? void 0 : _a.call(value, isValid);
             }
             else if (typeof value === 'object' && value !== null) {
                 if (!this.areAllValid(value)) {
@@ -98,16 +106,14 @@ class ValuesContainer {
     }
     parse(obj = this.values) {
         return Object.fromEntries(Object.entries(obj).map(([key, value]) => {
-            if (value instanceof InputValue) {
+            if (value instanceof inputValue_1.default) {
                 return [key, this.cast(value)];
             }
             else if (Array.isArray(value)) {
                 return [key, Object.values(this.parse(value))];
             }
-            else {
-                return [key, this.parse(value)];
-            }
+            return [key, this.parse(value)];
         }));
     }
 }
-module.exports = ValuesContainer;
+exports.default = ValuesContainer;

@@ -22,7 +22,8 @@
     "generate-certificate": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out gensec.pem -days 7 -nodes",
     "mongo-dump": "mongodump -d gensec -o backup",
     "mongo-restore": "mongorestore -d gensec backup",
-    "compile": "tsc && cp -r html build && cp -r css build && cp -r assets build"
+    "compile": "rm -rf build && tsc",
+    "copy": "cp -r html build && cp -r css build && cp -r assets build"
   },
   "main": "./build/mjs/main.js",
   "author": "William Roque",

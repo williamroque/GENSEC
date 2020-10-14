@@ -1,35 +1,44 @@
 "use strict";
-const { ipcMain, app } = require('electron');
-const path = require('path');
-const settings = require('electron-settings');
-const Filesystem = require('../filesystem/filesystem');
-const Python = require('../python');
-const Dialog = require('../dialog/dialog');
-const Window = require('../browser/window');
-
-export default class Communication {
-    static setDefaults() {
-        ipcMain.on('request-filesystem', (event, path, expectedEntry) => {
-            event.reply('send-filesystem', (new Filesystem(path, expectedEntry)).system);
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const electron_1 = require("electron");
+const path_1 = __importDefault(require("path"));
+const electron_settings_1 = __importDefault(require("electron-settings"));
+const filesystem_1 = __importDefault(require("../filesystem/filesystem"));
+const python_1 = __importDefault(require("../python"));
+const dialog_1 = __importDefault(require("../dialog/dialog"));
+const window_1 = __importDefault(require("../browser/window"));
+class Communication {
+    static setDefaults(menu) {
+        electron_1.ipcMain.on('request-filesystem', (event, path, expectedEntry) => {
+            event.reply('send-filesystem', (new filesystem_1.default(path, expectedEntry)).system);
         });
-        ipcMain.on('request-execute-package', (_, programName, packageName, input) => {
-            Python.run([path.join(app.getPath('userData'), 'system', programName, packageName, 'main.py')], input, settings.getSync([programName, packageName, 'janela', 'entries', 'dataWindowClosesOnFinish', 'setting']));
+        electron_1.ipcMain.on('request-execute-package', (_, programName, packageName, input) => {
+            python_1.default.run([path_1.default.join(electron_1.app.getPath('userData'), 'system', programName, packageName, 'main.py')], input, electron_settings_1.default.getSync([programName, packageName, 'janela', 'entries', 'dataWindowClosesOnFinish', 'setting']) === true);
         });
-        ipcMain.on('request-save-dialog', (event, extensions) => {
-            event.returnValue = Dialog.createSaveDialog(extensions);
+        electron_1.ipcMain.on('request-save-dialog', (event, extensions) => {
+            event.returnValue = dialog_1.default.createSaveDialog(extensions);
         });
-        ipcMain.on('request-update-search-enabled', (_, searchEnabled) => {
-            menu.items[2].submenu.items[0].enabled = searchEnabled;
+        electron_1.ipcMain.on('request-update-search-enabled', (_, searchEnabled) => {
+            var _a, _b;
+            if (typeof ((_b = (_a = menu === null || menu === void 0 ? void 0 : menu.items[2]) === null || _a === void 0 ? void 0 : _a.submenu) === null || _b === void 0 ? void 0 : _b.items[0]) !== 'undefined') {
+                menu.items[2].submenu.items[0].enabled = searchEnabled;
+            }
         });
-        ipcMain.on('request-update-edit-enabled', (_, editEnabled) => {
-            menu.items[1].submenu.items.forEach(elem => {
-                if (elem.type !== 'separator') {
-                    elem.enabled = editEnabled;
-                }
-            });
+        electron_1.ipcMain.on('request-update-edit-enabled', (_, editEnabled) => {
+            var _a, _b;
+            if (typeof ((_b = (_a = menu === null || menu === void 0 ? void 0 : menu.items[1]) === null || _a === void 0 ? void 0 : _a.submenu) === null || _b === void 0 ? void 0 : _b.items) !== 'undefined') {
+                menu.items[1].submenu.items.forEach(elem => {
+                    if (elem.type !== 'separator') {
+                        elem.enabled = editEnabled;
+                    }
+                });
+            }
         });
-        ipcMain.on('display-error-window', (_, err) => {
-            const errorWindow = new Window({
+        electron_1.ipcMain.on('display-error-window', (_, err) => {
+            const errorWindow = new window_1.default({
                 width: 820,
                 height: 700,
                 minWidth: 400,
@@ -40,3 +49,4 @@ export default class Communication {
         });
     }
 }
+exports.default = Communication;

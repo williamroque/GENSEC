@@ -1,16 +1,19 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 const ISDEVDIST = true;
-const path = require('path');
-const { app, Menu, shell } = require('electron');
-const Window = require('./browser/window');
-const Dialog = require('./dialog/dialog');
-const Filesystem = require('./filesystem/filesystem');
-const Communication = require('./communication/ipcm');
-Communication.setDefaults();
-const systemPath = path.join(app.getPath('userData'), 'system');
+const path_1 = __importDefault(require("path"));
+const electron_1 = require("electron");
+const window_1 = __importDefault(require("./browser/window"));
+const dialog_1 = __importDefault(require("./dialog/dialog"));
+const filesystem_1 = __importDefault(require("./filesystem/filesystem"));
+const ipcm_1 = __importDefault(require("./communication/ipcm"));
+const systemPath = path_1.default.join(electron_1.app.getPath('userData'), 'system');
 let mainWindow;
-app.on('ready', () => {
-    mainWindow = new Window({
+electron_1.app.on('ready', () => {
+    mainWindow = new window_1.default({
         icon: '../assets/icon.png',
         frame: false,
         minWidth: 890,
@@ -21,17 +24,17 @@ app.on('ready', () => {
     }, 'index.html', true);
     mainWindow.createWindow();
 });
-app.on('window-all-closed', () => {
-    app.exit(0);
+electron_1.app.on('window-all-closed', () => {
+    electron_1.app.exit(0);
 });
-app.on('activate', () => {
+electron_1.app.on('activate', () => {
     if (mainWindow.isNull()) {
         mainWindow.createWindow();
     }
 });
 const menuTemplate = [
     ...(process.platform === 'darwin' ? [{
-            label: app.name,
+            label: electron_1.app.name,
             submenu: [{
                     role: 'about'
                 },
@@ -50,7 +53,7 @@ const menuTemplate = [
                     role: 'hide'
                 },
                 {
-                    role: 'hideothers'
+                    role: 'hideOthers'
                 },
                 {
                     role: 'unhide'
@@ -64,34 +67,11 @@ const menuTemplate = [
                 {
                     label: 'Quit',
                     accelerator: 'Cmd+Q',
-                    click: () => app.exit(0)
+                    click: () => electron_1.app.exit(0)
                 }
             ]
         }] : []),
-    {
-        label: 'Text',
-        submenu: [
-            {
-                label: 'Copy',
-                accelerator: 'CmdOrCtrl+C',
-                click: () => mainWindow.dispatchWebEvent('copy'),
-                enabled: false
-            },
-            {
-                label: 'Paste',
-                accelerator: 'CmdOrCtrl+V',
-                click: () => mainWindow.dispatchWebEvent('paste'),
-                enabled: false
-            },
-            { type: 'separator' },
-            {
-                label: 'Select All',
-                accelerator: 'CmdOrCtrl+A',
-                click: () => mainWindow.dispatchWebEvent('select-all'),
-                enabled: false
-            },
-        ]
-    },
+    { role: 'editMenu' },
     {
         label: 'Form',
         submenu: [
@@ -118,13 +98,13 @@ const menuTemplate = [
                 label: 'Add Package',
                 accelerator: 'CmdOrCtrl+Shift+P',
                 click: () => {
-                    const packagePath = Dialog.createOpenDialog([{ name: 'GENSEC Package', extensions: ['gpf'] }]);
+                    const packagePath = dialog_1.default.createOpenDialog([{ name: 'GENSEC Package', extensions: ['gpf'] }]);
                     if (packagePath) {
-                        const filesystem = new Filesystem(systemPath);
+                        const filesystem = new filesystem_1.default(systemPath);
                         filesystem.attemptInsertPackage(packagePath[0]).then(() => {
-                            if (Dialog.ask('Reiniciar?')) {
-                                app.relaunch();
-                                app.exit();
+                            if (dialog_1.default.ask('Reiniciar?')) {
+                                electron_1.app.relaunch();
+                                electron_1.app.exit();
                             }
                         }).catch(console.log);
                     }
@@ -150,10 +130,11 @@ const menuTemplate = [
             },
             {
                 label: 'Relatar problema',
-                click: () => shell.openExternal(`mailto:william.roque@ethosgroup.com.br?subject=Arc@${app.getVersion()}%20Issue`)
+                click: () => electron_1.shell.openExternal(`mailto:william.roque@ethosgroup.com.br?subject=Arc@${electron_1.app.getVersion()}%20Issue`)
             }
         ]
     }
 ];
-const menu = Menu.buildFromTemplate(menuTemplate);
-Menu.setApplicationMenu(menu);
+const menu = electron_1.Menu.buildFromTemplate(menuTemplate);
+electron_1.Menu.setApplicationMenu(menu);
+ipcm_1.default.setDefaults(menu);
