@@ -16,6 +16,7 @@ class Settings extends elementController_1.default {
         this.programName = programName;
         this.packageName = packageName;
         this.settings = defaults;
+        this.setDefaults();
         this.seedTree();
     }
     seedTree() {

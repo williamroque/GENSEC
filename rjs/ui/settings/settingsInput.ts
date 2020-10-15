@@ -24,7 +24,9 @@ export default class SettingsInput extends ElementController {
     constructor(entryContent: EntryContent, updateSettingCallback: SettingCallback, settingsInstance: Settings) {
         super(
             'DIV', {
-                classList: new Set(['settings-input'])
+                classList: new Set([
+                    entryContent.type === 'checkbox' ? 'settings-input-checkbox' : 'settings-input'
+                ])
             }
         )
 
@@ -164,10 +166,11 @@ export default class SettingsInput extends ElementController {
             }
         }
 
-        console.log(targetValue);
         this.value.update(targetValue);
 
-        this.updateStyling();
+        if (this.type !== 'checkbox') {
+            this.updateStyling();
+        }
 
         return targetValue;
     }

@@ -19,7 +19,7 @@
     "start": "electron .",
     "dist-all": "electron-builder -mw",
     "dist": "electron-builder",
-    "generate-certificate": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out gensec.pem -days 7 -nodes",
+    "generate-certificate": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out gensec.pem -days 7 -nodes && cat key.pem >> gensec.pem && rm key.pem && mv gensec.pem ~/desktop",
     "mongo-dump": "mongodump -d gensec -o backup",
     "mongo-restore": "mongorestore -d gensec backup",
     "compile": "rm -rf build && tsc",

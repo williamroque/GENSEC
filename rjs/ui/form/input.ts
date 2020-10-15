@@ -57,9 +57,9 @@ export default class Input extends ElementController {
 
         this.getIndex = getIndex;
 
-        this.seedTree();
-
         this.value = new InputValue('', this.type, this.setValidityClassCallback.bind(this), settingsInstance);
+
+        this.seedTree();
     }
 
     seedTree() {
@@ -82,7 +82,7 @@ export default class Input extends ElementController {
         if (this.disabled) {
             inputController.element?.setAttribute('disabled', 'disabled');
         }
-        inputController.addEventListener('keydown', this.handleKeyEvent, this);
+        inputController.addEventListener('keyup', this.handleKeyEvent, this);
         this.addChild(inputController, 'input');
 
         if (this.type === 'percentage' || this.type === 'percentageOptional') {
@@ -98,6 +98,8 @@ export default class Input extends ElementController {
             this.addChild(percentageLabelController, 'percentageSymbol');
             inputController.addClass('percentage-input');
         }
+
+        this.updateFormValue('');
     }
 
     setValidityClassCallback(isValid: boolean) {
@@ -114,45 +116,6 @@ export default class Input extends ElementController {
             labelNode.removeClass('form-input-label-invalid');
             percentageLabelNode?.removeClass('percentage-symbol-invalid');
         }
-    }
-
-    updateField(key: string) {
-        const target = this.query('input')?.element as HTMLInputElement;
-
-        const selStart = target.selectionStart as number;
-        const selEnd = target.selectionEnd as number;
-
-        const selLength = selEnd - selStart;
-
-        let targetValue;
-
-        if (key === 'Backspace') {
-            let cursorOffset = 0;
-
-            if (selLength > 0) {
-                targetValue = this.setFieldValue('', [selStart, selEnd]);
-            } else {
-                targetValue = this.setFieldValue('', [selStart - 1, selEnd]);
-                cursorOffset = 1;
-            }
-
-            target.setSelectionRange(selStart - cursorOffset, selStart - cursorOffset);
-        } else {
-            targetValue = this.setFieldValue(key, [selStart, selEnd]);
-            target.setSelectionRange(selStart + 1, selStart + 1);
-        }
-
-        if (this.type === 'anualIncrement' || this.type === 'monthlyIncrement') {
-            if (this.value.test()) {
-                this.setAnchorCallback?.(
-                    this.incrementGroup,
-                    targetValue,
-                    this.type
-                );
-            }
-        }
-
-        return targetValue;
     }
 
     setFieldValue(value: string, range=[0, value.length]) {
@@ -195,33 +158,17 @@ export default class Input extends ElementController {
         }
     }
 
-    handleKeyEvent(e: Event) {
-        const event = e as KeyboardEvent;
+    handleKeyEvent() {
+        const target = this.query('input')?.element as HTMLInputElement;
+        this.updateFormValue(target.value);
 
-        if (event.key.length === 1 && !event.metaKey && !event.ctrlKey || event.key === 'Backspace') {
-            this.updateField(event.key)
-
-            event.preventDefault();
-        } else {
-            if ((event.metaKey || event.ctrlKey) && event.key === 'v') {
-                const target = this.query('input')?.element as HTMLInputElement;
-
-                const selStart = target.selectionStart as number;
-                const selEnd = target.selectionEnd as number;
-
-                const text = clipboard.readText();
-
-                this.setFieldValue(text, [selStart, selEnd])
-                target.setSelectionRange(selStart + text.length, selStart + text.length);
-            } else if ((event.metaKey || event.ctrlKey) && event.key === 'x') {
-                const target = this.query('input')?.element as HTMLInputElement;
-
-                const selStart = target.selectionStart as number;
-                const selEnd = target.selectionEnd as number;
-
-                clipboard.writeText(target.value.slice(selStart, selEnd));
-
-                this.updateField('');
+        if (this.type === 'anualIncrement' || this.type === 'monthlyIncrement') {
+            if (this.value.test()) {
+                this.setAnchorCallback?.(
+                    this.incrementGroup,
+                    target.value,
+                    this.type
+                );
             }
         }
     }

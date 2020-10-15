@@ -32,7 +32,7 @@ export default class Filesystem {
             fs.mkdirSync(this.systemPath);
         }
 
-        this.system = this.traverse(this.systemPath);
+        this.system = this.traverse(this.systemPath) || { type: 'directory', files: {} };
     }
 
     traverse(currentPath: string) {
@@ -56,13 +56,18 @@ export default class Filesystem {
                             manifest: manifest
                         };
                     }
+                    return;
                 } catch(e) {
                     console.log(e);
 
-                    return { type: 'directory', files: {} };
+                    return;
                 }
             } else if (/^[A-Za-z_ ]+$/.test(item)) {
-                (system.files as SystemFiles)[item] = this.traverse(itemPath);
+                const directory = this.traverse(itemPath);
+
+                if (typeof directory !== 'undefined') {
+                    (system.files as SystemFiles)[item] = directory;
+                }
             }
         }
 

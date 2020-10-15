@@ -9,7 +9,9 @@ const inputValue_1 = __importDefault(require("../inputValue"));
 class SettingsInput extends elementController_1.default {
     constructor(entryContent, updateSettingCallback, settingsInstance) {
         super('DIV', {
-            classList: new Set(['settings-input'])
+            classList: new Set([
+                entryContent.type === 'checkbox' ? 'settings-input-checkbox' : 'settings-input'
+            ])
         });
         this.title = entryContent.title;
         this.type = entryContent.type;
@@ -115,9 +117,10 @@ class SettingsInput extends elementController_1.default {
                 targetElement.value = targetValue;
             }
         }
-        console.log(targetValue);
         this.value.update(targetValue);
-        this.updateStyling();
+        if (this.type !== 'checkbox') {
+            this.updateStyling();
+        }
         return targetValue;
     }
     updateStyling() {

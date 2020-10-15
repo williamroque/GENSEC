@@ -66,6 +66,11 @@
     transition-duration: .05s;
 }
 
+.settings-input-checkbox {
+    display: flex;
+    align-items: center;
+}
+
 .settings-input:focus-within .settings-text-label, .settings-text-label-active {
     font-size: 8pt !important;
     font-weight: 800 !important;
@@ -83,9 +88,10 @@
 }
 
 .settings-checkbox-label {
-    font-family: courier;
+    font-family: helvetica;
     font-size: 10pt;
-    letter-spacing: -0.5px;
+    letter-spacing: 1px;
+    font-weight: 4000;
     color: #8a8575;
     width: 80%;
     cursor: pointer;

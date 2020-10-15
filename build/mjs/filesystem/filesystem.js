@@ -24,7 +24,7 @@ class Filesystem {
         if (!fs_1.default.existsSync(this.systemPath)) {
             fs_1.default.mkdirSync(this.systemPath);
         }
-        this.system = this.traverse(this.systemPath);
+        this.system = this.traverse(this.systemPath) || { type: 'directory', files: {} };
     }
     traverse(currentPath) {
         const items = fs_1.default.readdirSync(currentPath);
@@ -41,14 +41,18 @@ class Filesystem {
                             manifest: manifest
                         };
                     }
+                    return;
                 }
                 catch (e) {
                     console.log(e);
-                    return { type: 'directory', files: {} };
+                    return;
                 }
             }
             else if (/^[A-Za-z_ ]+$/.test(item)) {
-                system.files[item] = this.traverse(itemPath);
+                const directory = this.traverse(itemPath);
+                if (typeof directory !== 'undefined') {
+                    system.files[item] = directory;
+                }
             }
         }
         return system;

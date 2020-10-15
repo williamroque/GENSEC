@@ -1,4 +1,4 @@
-import { Db, DeleteWriteOpResultObject, FilterQuery, InsertWriteOpResult, MongoCallback, MongoClient, UpdateWriteOpResult, WriteOpResult } from 'mongodb';
+import { Db, DeleteWriteOpResultObject, FilterQuery, InsertWriteOpResult, MongoCallback, MongoClient, UpdateWriteOpResult } from 'mongodb';
 
 export default class Connection {
     private readonly dbName: string;

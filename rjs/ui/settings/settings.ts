@@ -27,6 +27,8 @@ export default class Settings extends ElementController {
 
         this.settings = defaults;
 
+        this.setDefaults();
+
         this.seedTree();
     }
 
