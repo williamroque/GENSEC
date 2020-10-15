@@ -21,6 +21,9 @@ class Communication {
         electron_1.ipcMain.on('request-save-dialog', (event, extensions) => {
             event.returnValue = dialog_1.default.createSaveDialog(extensions);
         });
+        electron_1.ipcMain.on('request-open-dialog', (event, extensions) => {
+            event.returnValue = dialog_1.default.createOpenDialog(extensions);
+        });
         electron_1.ipcMain.on('request-update-search-enabled', (_, searchEnabled) => {
             var _a, _b;
             if (typeof ((_b = (_a = menu === null || menu === void 0 ? void 0 : menu.items[2]) === null || _a === void 0 ? void 0 : _a.submenu) === null || _b === void 0 ? void 0 : _b.items[0]) !== 'undefined') {

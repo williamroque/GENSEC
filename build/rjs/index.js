@@ -31,6 +31,7 @@ const form_1 = __importDefault(require("../rjs/ui/form/form"));
 const elementController_1 = __importDefault(require("../rjs/ui/elementController"));
 const settings_1 = __importDefault(require("../rjs/ui/settings/settings"));
 const connection_1 = __importDefault(require("../rjs/communication/connection"));
+const table_1 = __importDefault(require("./ui/table/table"));
 const sidebar = document.querySelector('#sidebar');
 const mainContainer = document.querySelector('#main-wrapper');
 const settingsContainer = document.querySelector('#settings-wrapper');
@@ -97,7 +98,7 @@ buildViewButton.addEventListener('click', () => {
                 }
             }, this);
             buttonContainerController.addChild(executarButtonController);
-            form.addChild(buttonContainerController);
+            mainContainer.appendChild(buttonContainerController.element);
         });
         navigationController.activate();
     });
@@ -111,28 +112,38 @@ editViewButton.addEventListener('click', () => {
         navigationController = new navigator_1.default(system, mainContainer, (manifest) => {
             settings = new settings_1.default(manifest.defaultSettings, settingsContainer, settingsViewButton, manifest.programName, manifest.packageName);
             settings.activate();
+            if (!('dataHeaders' in manifest))
+                return;
             try {
-                const connection = new connection_1.default(manifest.programName, settings.get('network', 'ip').setting, settings.get('network', 'port').setting, settings.get('credentials', 'username').setting, settings.get('credentials', 'password').setting, certificatePath);
+                const headers = manifest.dataHeaders;
+                const connection = new connection_1.default(manifest.programName, manifest.packageName, headers, settings.get('network', 'ip').setting, settings.get('network', 'port').setting, settings.get('credentials', 'username').setting, settings.get('credentials', 'password').setting, certificatePath);
                 connection.connect().then(() => {
-                    connection.getAll(manifest.packageName, data => {
-                        console.log(data);
-                        //const table = new Table();
-                        //table.activate();
-                        //const buttonContainerController = new ElementController(
-                        //    'DIV', {
-                        //    classList: new Set(['action-button-container'])
-                        //}
-                        //);
-                        //const voltarButtonController = new ElementController(
-                        //    'BUTTON', {
-                        //    text: 'Voltar',
-                        //    classList: new Set(['form-button', 'action-button'])
-                        //}
-                        //);
-                        //voltarButtonController.addEventListener('click', navigator.activate, navigator);
-                        //voltarButtonController.addEventListener('click', settings.disableShowButton, settings);
-                        //buttonContainerController.addChild(voltarButtonController);
-                        //table.addChild(buttonContainerController);
+                    connection.getAll((err, data) => {
+                        if (err)
+                            throw err;
+                        const table = new table_1.default(data, headers, mainContainer);
+                        table.activate();
+                        const buttonContainerController = new elementController_1.default('DIV', {
+                            classList: new Set(['action-button-container'])
+                        });
+                        const voltarButtonController = new elementController_1.default('BUTTON', {
+                            text: 'Voltar',
+                            classList: new Set(['form-button', 'action-button'])
+                        });
+                        voltarButtonController.addEventListener('click', navigationController.activate, navigator);
+                        voltarButtonController.addEventListener('click', settings.disableShowButton, settings);
+                        buttonContainerController.addChild(voltarButtonController);
+                        const spacerController = new elementController_1.default('DIV', {
+                            classList: new Set(['spacer'])
+                        });
+                        buttonContainerController.addChild(spacerController);
+                        const importButtonController = new elementController_1.default('BUTTON', {
+                            text: 'Importar',
+                            classList: new Set(['form-button', 'action-button'])
+                        });
+                        importButtonController.addEventListener('click', connection.attemptImportData, connection);
+                        buttonContainerController.addChild(importButtonController);
+                        mainContainer.appendChild(buttonContainerController.element);
                     });
                 }).catch(err => {
                     throw err;

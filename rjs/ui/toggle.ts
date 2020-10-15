@@ -10,7 +10,7 @@ export default class Toggle {
         }
     }
 
-    static show(buttons: [ElementController], x: number, y: number) {
+    static show(buttons: ElementController[], x: number, y: number) {
         Toggle.clearPrompt();
 
         for (const button of buttons) {

@@ -2,6 +2,7 @@ const ISDEVDIST = true;
 
 import path from 'path';
 import { app, Menu, shell } from 'electron';
+import fs from 'fs';
 
 import Window from './browser/window';
 import Dialog from './dialog/dialog';
@@ -88,8 +89,6 @@ const menuTemplate = [
     {
         label: 'Window',
         submenu: [
-            { role: 'quit' },
-            { type: 'separator' },
             { role: 'minimize' },
             { role: 'close' }
         ]
@@ -97,34 +96,63 @@ const menuTemplate = [
     {
         label: 'Packages',
         submenu: [{
-                label: 'Add Package',
-                accelerator: 'CmdOrCtrl+Shift+P',
-                click: () => {
-                    const packagePath = Dialog.createOpenDialog([{ name: 'GENSEC Package', extensions: ['gpf'] }]);
+            label: 'Add Package',
+            accelerator: 'CmdOrCtrl+Shift+P',
+            click: () => {
+                const packagePath = Dialog.createOpenDialog([{ name: 'GENSEC Package', extensions: ['gpf'] }]);
 
-                    if (packagePath) {
-                        const filesystem = new Filesystem(systemPath);
-                        filesystem.attemptInsertPackage(packagePath[0]).then(() => {
-                            if (Dialog.ask('Reiniciar?')) {
-                                app.relaunch();
-                                app.exit();
-                            }
-                        }).catch(console.log);
+                if (typeof packagePath !== 'undefined') {
+                    const filesystem = new Filesystem(systemPath);
+                    filesystem.attemptInsertPackage(packagePath[0]).then(() => {
+                        if (Dialog.ask('Reiniciar?')) {
+                            app.relaunch();
+                            app.exit();
+                        }
+                    }).catch(console.log);
+                }
+            }
+        }]
+    },
+    {
+        label: 'Network',
+        submenu: [{
+            label: 'Add Certificate',
+            accelerator: 'CmdOrCtrl+Shift+C',
+            click: () => {
+                const certificatePath = Dialog.createOpenDialog([{ name: 'Certificate', extensions: ['pem'] }]);
+                const certificatesDirectory = path.join(app.getPath('userData'), 'cert');
 
+                if (typeof certificatePath !== 'undefined') {
+                    try {
+                        if (!fs.existsSync(certificatesDirectory)) {
+                            fs.mkdirSync(certificatesDirectory);
+                        }
+
+                        fs.copyFileSync(
+                            certificatePath[0],
+                            path.join(certificatesDirectory, path.basename(certificatePath[0]))
+                        );
+                    } catch (error) {
+                        console.log(error);
                     }
                 }
             }
-        ]
+        }]
     },
     ...(ISDEVDIST ? [{
-            label: 'Developer',
-            submenu: [
-                {
-                    label: 'Toggle Developer Tools',
-                    accelerator: 'CmdOrCtrl+Alt+I',
-                    click: () => mainWindow.toggleDevTools()
-                }
-            ]
+        label: 'Developer',
+        submenu: [
+            {
+                label: 'Toggle Developer Tools',
+                accelerator: 'CmdOrCtrl+Alt+I',
+                click: () => mainWindow.toggleDevTools()
+            },
+            {
+                label: 'Open Application Support',
+                accelerator: 'CmdOrCtrl+Shift+A',
+                click: () => shell.openPath(app.getPath('userData'))
+            }
+        ]
     }] : []),
     {
         label: 'Help',

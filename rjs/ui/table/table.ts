@@ -1,15 +1,21 @@
 import ElementController from '../elementController';
 import TableCell from './tableCell';
 
+type Data = {[propName: string]: string}[];
+
 export default class Table extends ElementController {
-    constructor(data, headers, container) {
+    private readonly data: Data;
+    private readonly headers: string[];
+    private readonly container: HTMLDivElement;
+
+    constructor(data: Data | null, headers: string[], container: HTMLDivElement) {
         super(
             'TABLE', {
                 classList: new Set(['data-table'])
             }
         );
 
-        this.data = data;
+        this.data = data || [];
         this.headers = headers;
         this.container = container;
 
@@ -40,8 +46,8 @@ export default class Table extends ElementController {
                 }
             );
 
-            for (const dataCell of dataRow) {
-                const tableCell = new TableCell(dataCell);
+            for (const header of this.headers) {
+                const tableCell = new TableCell(dataRow[header.replace(/\./g, '')]);
 
                 rowController.addChild(tableCell);
             }
@@ -59,6 +65,6 @@ export default class Table extends ElementController {
 
     activate() {
         this.clearContainer();
-        this.container.appendChild(this.element);
+        this.container.appendChild(this.element as HTMLTableElement);
     }
 }

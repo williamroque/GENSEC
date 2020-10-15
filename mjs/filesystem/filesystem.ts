@@ -74,7 +74,7 @@ export default class Filesystem {
         return system;
     }
 
-    insertDirectory(directoryPath: [string]) {
+    insertDirectory(directoryPath: string[]) {
         let currentPath = this.system;
         let fullPath = this.systemPath;
 

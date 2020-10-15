@@ -10,7 +10,7 @@ class Dialog {
     }
     static createOpenDialog(filters) {
         return electron_1.dialog.showOpenDialogSync({
-            properties: [],
+            properties: ['openFile'],
             filters: filters
         });
     }

@@ -14,7 +14,7 @@ class TableCell extends elementController_1.default {
     }
     seedTree() {
         const textController = new elementController_1.default('SPAN', {
-            text: this.data.display,
+            text: this.data,
             classList: new Set(['data-table-cell-text'])
         });
         this.addChild(textController);

@@ -3,16 +3,16 @@ import { Extension } from "../filesystem/manifest";
 import { dialog } from 'electron';
 
 export default class Dialog {
-    static createSaveDialog(filters: [Extension]) {
+    static createSaveDialog(filters: Extension[]) {
         return dialog.showSaveDialogSync({
             properties: [],
             filters: filters
         })
     }
 
-    static createOpenDialog(filters: [Extension]) {
+    static createOpenDialog(filters: Extension[]) {
         return dialog.showOpenDialogSync({
-            properties: [],
+            properties: ['openFile'],
             filters: filters
         });
     }

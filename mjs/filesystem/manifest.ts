@@ -1,6 +1,6 @@
 export interface Extension {
     name: string,
-    extensions: [string]
+    extensions: string[]
 }
 
 export interface SettingsSchema {
@@ -26,10 +26,11 @@ export default interface Manifest {
     title: string,
     programName: string,
     packageName: string,
-    requirements: [string],
-    allowedOutputExtensions: [Extension],
-    form: [FormRow],
+    requirements: string[],
+    allowedOutputExtensions: Extension[],
+    form: FormRow[],
     isDefault?: boolean,
     requiresDatabaseAccess?: boolean,
+    dataHeaders?: string[],
     defaultSettings?: SettingsSchema
 }

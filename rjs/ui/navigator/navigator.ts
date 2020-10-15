@@ -9,7 +9,7 @@ export default class Navigator extends ElementController {
     private readonly activateCallback: (manifest: Manifest) => void;
 
     private currentDirectory: System;
-    private path: Array<string>;
+    private path: string[];
 
     constructor(filesystem: System, container: HTMLDivElement, activateCallback: (manifest: Manifest) => void) {
         super(

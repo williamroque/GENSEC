@@ -1,5 +1,3 @@
-import { clipboard } from 'electron';
-
 import ElementController from '../elementController';
 import InputValue from '../inputValue';
 import Settings from '../settings/settings';

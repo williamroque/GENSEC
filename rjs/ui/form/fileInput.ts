@@ -16,14 +16,14 @@ interface ReadToRows {
     label: string,
     sync: boolean,
     drawFrom: string,
-    inputs: [InputProperties]
+    inputs: InputProperties[]
 }
 
 export interface FileInputProperties {
     id: string,
     label: string,
     max: number,
-    allowedExtensions: [Extension],
+    allowedExtensions: Extension[],
     readToRows?: ReadToRows
 }
 
@@ -34,12 +34,12 @@ export default class FileInput extends ElementController {
     private readonly id: string;
     private readonly max: number;
     private readonly readToRows?: ReadToRows;
-    private readonly allowedExtensions: [Extension];
+    private readonly allowedExtensions: Extension[];
     private readonly files: Set<string>;
     private readonly value: InputValue;
 
     private fileCount: number;
-    private lists: Array<List>;
+    private lists: List[];
 
     constructor(valuesContainer: ValuesContainer, properties: FileInputProperties, parentNode: ElementController, settingsInstance: Settings) {
         super(
@@ -102,7 +102,7 @@ export default class FileInput extends ElementController {
             for (const file of Array.from(event.dataTransfer.files)) {
                 const filePattern = /^.+\.([a-z]+)$/;
 
-                const [path, extension] = file.path.match(filePattern) as Array<string>;
+                const [path, extension] = file.path.match(filePattern) as string[];
 
                 if (this.allowedExtensions.map(x => x.extensions).flat().indexOf(extension) > -1) {
                     allowedFiles.push(path);
@@ -187,7 +187,7 @@ export default class FileInput extends ElementController {
                 );
                 this.parentNode.addChild(rowController);
 
-                for (const row of (rows as [[number]])) {
+                for (const row of (rows as number[][])) {
                     list.addRow(row);
                 }
             });

@@ -1,7 +1,9 @@
 import ElementController from '../elementController';
 
 export default class TableCell extends ElementController {
-    constructor(data) {
+    private readonly data: string;
+
+    constructor(data: string) {
         super(
             'TD', {
                 classList: new Set(['data-table-cell'])
@@ -16,7 +18,7 @@ export default class TableCell extends ElementController {
     seedTree() {
         const textController = new ElementController(
             'SPAN', {
-                text: this.data.display,
+                text: this.data,
                 classList: new Set(['data-table-cell-text'])
             }
         );

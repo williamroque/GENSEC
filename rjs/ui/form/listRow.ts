@@ -25,7 +25,7 @@ export default class ListRow extends ElementController {
 
     private deleteCallback: (index: number, nodeID: string) => void;
     private indexValue: number;
-    private inputs: Array<Input>;
+    private inputs: Input[];
     private incrementInputs: { [propName: string]: any };
     private calibrateIndicesCallback?: () => void;
     private incrementAnchors?: { [propName: string]: any };
@@ -101,7 +101,7 @@ export default class ListRow extends ElementController {
         this.addChild(deleteButton);
     }
 
-    setFormValues(values: [string] | [number]) {
+    setFormValues(values: string[] | number[]) {
         this.inputs.forEach((input: Input, i: number) => {
             if (typeof values !== 'undefined') {
                 let formattedNum = values[i].toString();

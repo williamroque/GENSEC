@@ -10,7 +10,7 @@ class Table extends elementController_1.default {
         super('TABLE', {
             classList: new Set(['data-table'])
         });
-        this.data = data;
+        this.data = data || [];
         this.headers = headers;
         this.container = container;
         this.seedTree();
@@ -31,8 +31,8 @@ class Table extends elementController_1.default {
             const rowController = new elementController_1.default('TR', {
                 classList: new Set(['data-table-row'])
             });
-            for (const dataCell of dataRow) {
-                const tableCell = new tableCell_1.default(dataCell);
+            for (const header of this.headers) {
+                const tableCell = new tableCell_1.default(dataRow[header]);
                 rowController.addChild(tableCell);
             }
             this.addChild(rowController);

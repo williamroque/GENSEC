@@ -21,18 +21,18 @@ export default class List extends ElementController {
     private readonly max: number;
     private readonly min: number;
     private readonly settingsInstance: Settings;
-    private readonly syncedLists?: Array<List>;
+    private readonly syncedLists?: List[];
     private readonly fileData?: object;
 
     private showStateComplementLabel: string;
-    private listRows: Array<ListRow>;
+    private listRows: ListRow[];
     private incrementAnchors: object;
 
     listController?: ElementController;
     moreContainerController?: ElementController;
     buttonController?: ElementController;
 
-    constructor(valuesContainer: ValuesContainer, properties: ListProperties, settingsInstance: Settings, syncedLists?: Array<List>, fileData?: { [propName: string]: string }) {
+    constructor(valuesContainer: ValuesContainer, properties: ListProperties, settingsInstance: Settings, syncedLists?: List[], fileData?: { [propName: string]: string }) {
         super(
             'DIV', {
                 classList: new Set(['list-container'])
@@ -142,7 +142,7 @@ export default class List extends ElementController {
         }
     }
 
-    addRow(values?: [string] | [number]) {
+    addRow(values?: string[] | number[]) {
         if (Object.values(this.listController?.getChildren() as { [propName: string]: ElementController }).length < this.max) {
             const listRow = new ListRow(this.valuesContainer, this.deleteCallback.bind(this), this.id, this.inputs, this.listRows.length, this.settingsInstance, this.incrementAnchors, this.calibrateIndices.bind(this), this.fileData);
             this.listController?.addChild(listRow);

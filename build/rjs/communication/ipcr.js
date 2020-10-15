@@ -14,6 +14,9 @@ class Communication {
     static requestSaveDialog(extensions) {
         return electron_1.ipcRenderer.sendSync('request-save-dialog', extensions);
     }
+    static requestOpenDialog(extensions) {
+        return electron_1.ipcRenderer.sendSync('request-open-dialog', extensions);
+    }
     static requestUpdateSearchEnabled(searchEnabled) {
         electron_1.ipcRenderer.send('request-update-search-enabled', searchEnabled);
     }

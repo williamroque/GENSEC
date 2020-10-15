@@ -14,8 +14,12 @@ export default class Communication {
         ipcRenderer.send('request-execute-package', programName, packageName, input);
     }
 
-    static requestSaveDialog(extensions: [Extension]): string | undefined {
+    static requestSaveDialog(extensions: Extension[]): string | undefined {
         return ipcRenderer.sendSync('request-save-dialog', extensions);
+    }
+
+    static requestOpenDialog(extensions: Extension[]): string | undefined {
+        return ipcRenderer.sendSync('request-open-dialog', extensions);
     }
 
     static requestUpdateSearchEnabled(searchEnabled: boolean) {

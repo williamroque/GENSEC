@@ -26,6 +26,10 @@ export default class Communication {
             event.returnValue = Dialog.createSaveDialog(extensions);
         });
 
+        ipcMain.on('request-open-dialog', (event, extensions) => {
+            event.returnValue = Dialog.createOpenDialog(extensions);
+        });
+
         ipcMain.on('request-update-search-enabled', (_, searchEnabled) => {
             if (typeof menu?.items[2]?.submenu?.items[0] !== 'undefined') {
                 menu.items[2].submenu.items[0].enabled = searchEnabled;
