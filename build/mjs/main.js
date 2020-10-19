@@ -43,14 +43,6 @@ const menuTemplate = [
                     type: 'separator'
                 },
                 {
-                    label: 'Configurações',
-                    accelerator: 'CmdOrCtrl+,',
-                    click: () => { }
-                },
-                {
-                    type: 'separator'
-                },
-                {
                     role: 'hide'
                 },
                 {

@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const elementController_1 = __importDefault(require("../elementController"));
 const inputValue_1 = __importDefault(require("../inputValue"));
 class Input extends elementController_1.default {
-    constructor(valuesContainer, properties, settingsInstance, listID, setAnchorCallback, getIndex) {
+    constructor(valuesContainer, properties, settingsInstance, listID, setAnchorCallback, getIndexCallback) {
         super('DIV', {
             width: properties.width,
             classList: new Set(['form-cell'])
@@ -20,7 +20,7 @@ class Input extends elementController_1.default {
         this.disabled = properties.disabled;
         this.listID = listID;
         this.setAnchorCallback = setAnchorCallback;
-        this.getIndex = getIndex;
+        this.getIndexCallback = getIndexCallback;
         this.value = new inputValue_1.default('', this.type, this.setValidityClassCallback.bind(this), settingsInstance);
         this.seedTree();
     }
@@ -82,8 +82,8 @@ class Input extends elementController_1.default {
     }
     updateFormValue(value) {
         this.value.update(value);
-        if (typeof this.listID !== 'undefined' && typeof this.getIndex !== 'undefined') {
-            this.valuesContainer.update(this.value, this.listID, this.group, this.getIndex());
+        if (typeof this.listID !== 'undefined' && typeof this.getIndexCallback !== 'undefined') {
+            this.valuesContainer.update(this.value, this.listID, this.group, this.getIndexCallback());
         }
         else {
             this.valuesContainer.update(this.value, this.id, this.group);

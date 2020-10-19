@@ -25,11 +25,12 @@ class ElementController {
     getChildren() {
         return this.DOMTree.children;
     }
-    addChild(node, id) {
+    addChild(node, id, prepend = false) {
         if (typeof id === "undefined") {
             id = `unique-${this.childID++}`;
         }
         node.nodeID = id;
+        node.prepend = prepend;
         this.DOMTree.children[id] = node;
         this.render();
         return id;
@@ -37,6 +38,14 @@ class ElementController {
     removeChild(id) {
         this.DOMTree.children[id].remove();
         delete this.DOMTree.children[id];
+    }
+    getIndex() {
+        let child = this.element;
+        let nodeIndex = 0;
+        while ((child = child.previousSibling) !== null) {
+            nodeIndex++;
+        }
+        return nodeIndex;
     }
     setText(text) {
         this.DOMTree.text = text;
@@ -83,11 +92,17 @@ class ElementController {
         }
         for (const childNode of Object.values(this.DOMTree.children)) {
             childNode.render();
-            this.element.appendChild(childNode.element);
+            if (typeof childNode.prepend !== 'undefined' && childNode.prepend) {
+                this.element.prepend(childNode.element);
+            }
+            else {
+                this.element.appendChild(childNode.element);
+            }
         }
     }
     remove() {
         var _a;
+        this.nodeID = undefined;
         (_a = this.element) === null || _a === void 0 ? void 0 : _a.remove();
     }
 }

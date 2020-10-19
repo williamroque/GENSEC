@@ -64,7 +64,6 @@ export default class List extends ElementController {
                     'text': this.showStateComplementLabel
                 }
             )
-
             button.addEventListener('click', function(this: List) {
                 this.toggleListItemsVisibility();
             }, this);

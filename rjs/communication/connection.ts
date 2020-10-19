@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Db, DeleteWriteOpResultObject, FilterQuery, InsertWriteOpResult, MongoCallback, MongoClient, UpdateWriteOpResult } from 'mongodb';
+import { Db, DeleteWriteOpResultObject, FilterQuery, MongoCallback, MongoClient, UpdateWriteOpResult } from 'mongodb';
 import Communication from '../../rjs/communication/ipcr';
 
 export default class Connection {

@@ -13,14 +13,6 @@ class FileInputRow extends elementController_1.default {
         this.path = path;
         this.seedTree();
     }
-    getIndex() {
-        let child = this.element;
-        let nodeIndex = 0;
-        while ((child = child.previousSibling) !== null) {
-            nodeIndex++;
-        }
-        return nodeIndex;
-    }
     seedTree() {
         this.addEventListener('click', e => {
             e.stopPropagation();

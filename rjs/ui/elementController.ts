@@ -11,6 +11,9 @@ export default class ElementController {
     
     nodeID?: string;
     element?: HTMLElement;
+    prepend?: boolean;
+
+    dataProperties?: {[propName: string]: any};
 
     constructor(type: string, properties: Properties) {
         this.DOMTree = {
@@ -45,11 +48,12 @@ export default class ElementController {
         return this.DOMTree.children;
     }
 
-    addChild<T extends ElementController>(node: T, id?: string) {
+    addChild<T extends ElementController>(node: T, id?: string, prepend=false) {
         if (typeof id === "undefined") {
             id = `unique-${this.childID++}`;
         }
         node.nodeID = id;
+        node.prepend = prepend;
 
         this.DOMTree.children[id] = node;
 
@@ -61,6 +65,17 @@ export default class ElementController {
     removeChild(id: string) {
         this.DOMTree.children[id].remove();
         delete this.DOMTree.children[id];
+    }
+
+    getIndex() {
+        let child: ChildNode | null = this.element as ChildNode;
+        let nodeIndex = 0;
+
+        while ((child = child.previousSibling) !== null) {
+            nodeIndex++;
+        }
+
+        return nodeIndex;
     }
 
     setText(text: string) {
@@ -116,11 +131,17 @@ export default class ElementController {
 
         for (const childNode of Object.values(this.DOMTree.children)) {
             childNode.render();
-            this.element.appendChild(childNode.element as HTMLElement);
+
+            if (typeof childNode.prepend !== 'undefined' && childNode.prepend) {
+                this.element.prepend(childNode.element as HTMLElement);
+            } else {
+                this.element.appendChild(childNode.element as HTMLElement);
+            }
         }
     }
 
     remove() {
+        this.nodeID = undefined;
         this.element?.remove();
     }
 }

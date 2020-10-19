@@ -159,7 +159,7 @@ editViewButton.addEventListener('click', () => {
                     connection.getAll((err, data) => {
                         if (err) throw err;
 
-                        const table = new Table(data, headers, mainContainer);
+                        const table = new Table(data, connection, headers, mainContainer);
                         table.activate();
 
                         const buttonContainerController = new ElementController(
@@ -174,8 +174,11 @@ editViewButton.addEventListener('click', () => {
                                 classList: new Set(['form-button', 'action-button'])
                             }
                         );
-                        voltarButtonController.addEventListener('click', navigationController.activate, navigator);
-                        voltarButtonController.addEventListener('click', settings.disableShowButton, settings);
+                        voltarButtonController.addEventListener('click', function() {
+                            navigationController.activate.call(navigationController);
+                            settings.disableShowButton.call(settings);
+                            connection.close();
+                        }, this);
                         buttonContainerController.addChild(voltarButtonController);
 
                         const spacerController = new ElementController(
@@ -191,7 +194,11 @@ editViewButton.addEventListener('click', () => {
                                 classList: new Set(['form-button', 'action-button'])
                             }
                         );
-                        importButtonController.addEventListener('click', connection.attemptImportData, connection);
+                        importButtonController.addEventListener('click', function() {
+                            navigationController.activate.call(navigationController);
+                            settings.disableShowButton.call(settings);
+                            connection.attemptImportData.call(connection);
+                        }, this);
                         buttonContainerController.addChild(importButtonController);
 
                         mainContainer.appendChild(buttonContainerController.element as HTMLButtonElement);

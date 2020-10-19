@@ -21,17 +21,6 @@ export default class FileInputRow extends ElementController {
         this.seedTree();
     }
 
-    getIndex() {
-        let child: ChildNode | null = this.element as ChildNode;
-        let nodeIndex = 0;
-
-        while ((child = child.previousSibling) !== null) {
-            nodeIndex++;
-        }
-
-        return nodeIndex;
-    }
-
     seedTree() {
         this.addEventListener('click', e => {
             e.stopPropagation();

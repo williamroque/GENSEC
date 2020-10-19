@@ -121,7 +121,7 @@ editViewButton.addEventListener('click', () => {
                     connection.getAll((err, data) => {
                         if (err)
                             throw err;
-                        const table = new table_1.default(data, headers, mainContainer);
+                        const table = new table_1.default(data, connection, headers, mainContainer);
                         table.activate();
                         const buttonContainerController = new elementController_1.default('DIV', {
                             classList: new Set(['action-button-container'])
@@ -130,8 +130,11 @@ editViewButton.addEventListener('click', () => {
                             text: 'Voltar',
                             classList: new Set(['form-button', 'action-button'])
                         });
-                        voltarButtonController.addEventListener('click', navigationController.activate, navigator);
-                        voltarButtonController.addEventListener('click', settings.disableShowButton, settings);
+                        voltarButtonController.addEventListener('click', function () {
+                            navigationController.activate.call(navigationController);
+                            settings.disableShowButton.call(settings);
+                            connection.close();
+                        }, this);
                         buttonContainerController.addChild(voltarButtonController);
                         const spacerController = new elementController_1.default('DIV', {
                             classList: new Set(['spacer'])
@@ -141,7 +144,11 @@ editViewButton.addEventListener('click', () => {
                             text: 'Importar',
                             classList: new Set(['form-button', 'action-button'])
                         });
-                        importButtonController.addEventListener('click', connection.attemptImportData, connection);
+                        importButtonController.addEventListener('click', function () {
+                            navigationController.activate.call(navigationController);
+                            settings.disableShowButton.call(settings);
+                            connection.attemptImportData.call(connection);
+                        }, this);
                         buttonContainerController.addChild(importButtonController);
                         mainContainer.appendChild(buttonContainerController.element);
                     });

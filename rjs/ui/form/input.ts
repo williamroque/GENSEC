@@ -28,11 +28,11 @@ export default class Input extends ElementController {
     private readonly listID?: string;
 
     private setAnchorCallback?: AnchorCallback;
-    private getIndex?: () => number;
+    private getIndexCallback?: () => number;
 
     readonly type: string;
 
-    constructor(valuesContainer: ValuesContainer, properties: InputProperties, settingsInstance: Settings, listID?: string, setAnchorCallback?: AnchorCallback, getIndex?: () => number) {
+    constructor(valuesContainer: ValuesContainer, properties: InputProperties, settingsInstance: Settings, listID?: string, setAnchorCallback?: AnchorCallback, getIndexCallback?: () => number) {
         super(
             'DIV', {
                 width: properties.width,
@@ -53,7 +53,7 @@ export default class Input extends ElementController {
 
         this.setAnchorCallback = setAnchorCallback;
 
-        this.getIndex = getIndex;
+        this.getIndexCallback = getIndexCallback;
 
         this.value = new InputValue('', this.type, this.setValidityClassCallback.bind(this), settingsInstance);
 
@@ -131,8 +131,8 @@ export default class Input extends ElementController {
     updateFormValue(value: string) {
         this.value.update(value);
 
-        if (typeof this.listID !== 'undefined' && typeof this.getIndex !== 'undefined') {
-            this.valuesContainer.update(this.value, this.listID, this.group, this.getIndex());
+        if (typeof this.listID !== 'undefined' && typeof this.getIndexCallback !== 'undefined') {
+            this.valuesContainer.update(this.value, this.listID, this.group, this.getIndexCallback());
         } else {
             this.valuesContainer.update(this.value, this.id, this.group);
         }
