@@ -17,7 +17,7 @@ class Input extends elementController_1.default {
         this.group = properties.group;
         this.type = properties.type;
         this.incrementGroup = properties.incrementGroup;
-        this.disabled = properties.disabled;
+        this.disabled = properties.disabled || false;
         this.listID = listID;
         this.setAnchorCallback = setAnchorCallback;
         this.getIndexCallback = getIndexCallback;
@@ -54,6 +54,9 @@ class Input extends elementController_1.default {
             inputController.addClass('percentage-input');
         }
         this.updateFormValue('');
+    }
+    getValue() {
+        return this.value.content;
     }
     setValidityClassCallback(isValid) {
         const inputNode = this.query('input');
@@ -110,7 +113,7 @@ class Input extends elementController_1.default {
         const target = (_a = this.query('input')) === null || _a === void 0 ? void 0 : _a.element;
         this.updateFormValue(target.value);
         if (this.type === 'anualIncrement' || this.type === 'monthlyIncrement') {
-            if (this.value.test()) {
+            if (this.value.test() && typeof this.incrementGroup !== 'undefined') {
                 (_b = this.setAnchorCallback) === null || _b === void 0 ? void 0 : _b.call(this, this.incrementGroup, target.value, this.type);
             }
         }

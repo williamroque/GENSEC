@@ -1,5 +1,7 @@
 import Connection from '../../communication/connection';
 import ElementController from '../elementController';
+import ValuesContainer from '../form/valuesContainer';
+import Settings from '../settings/settings';
 import Toggle from '../toggle';
 import TableCell from './tableCell';
 
@@ -15,12 +17,14 @@ export default class Table extends ElementController {
     private readonly connection: Connection;
     private readonly headers: string[];
     private readonly container: HTMLDivElement;
+    private readonly settingsInstance: Settings;
 
     private tableBody?: ElementController;
     private tableRows: ElementController[];
     private index;
+    private currentlyEditing?: ElementController;
 
-    constructor(data: Data | null, connection: Connection, headers: string[], container: HTMLDivElement) {
+    constructor(data: Data | null, connection: Connection, headers: string[], container: HTMLDivElement, settingsInstance: Settings) {
         super(
             'TABLE', {
                 classList: new Set(['data-table'])
@@ -31,6 +35,7 @@ export default class Table extends ElementController {
         this.connection = connection;
         this.headers = headers;
         this.container = container;
+        this.settingsInstance = settingsInstance;
 
         this.tableRows = [];
         this.index = 0;
@@ -127,6 +132,14 @@ export default class Table extends ElementController {
 
             scrollbarElement.style.top = `${(this.index * this.rowHeight + tableBody.scrollTop) * (viewHeight - 10) / (this.tableRows.length * this.rowHeight)}px`;
         }, this);
+
+        document.addEventListener('keydown', (function(this: Table, e: Event) {
+            const { key } = e as KeyboardEvent;
+            
+            if (key === 'Escape' && typeof this.currentlyEditing !== 'undefined') {
+                this.exitEditModeFor(this.currentlyEditing, false);
+            }
+        }).bind(this), false);
     }
 
     addRow(dataRow: {[propName: string]: string}) {
@@ -135,10 +148,36 @@ export default class Table extends ElementController {
                 classList: new Set(['data-table-row'])
             }
         );
-        rowController.dataProperties = dataRow;
+        rowController.dataProperties = {
+            dataRow: dataRow,
+            editMode: false,
+            valuesContainer: new ValuesContainer(this.settingsInstance)
+        };
         rowController.addEventListener('click', function(this: Table, e: Event) {
             const event = e as MouseEvent;
             event.stopPropagation();
+
+            if (rowController.dataProperties.editMode) return;
+
+            const editButton = new ElementController(
+                'BUTTON', {
+                    classList: new Set(['toggle-button']),
+                    text: 'Editar'
+                }
+            );
+            editButton.addEventListener('click', function(this: Table) {
+                if (typeof this.currentlyEditing !== 'undefined') {
+                    this.exitEditModeFor(this.currentlyEditing, false);
+                }
+
+                rowController.addClass('data-table-row-edit');
+                rowController.dataProperties.editMode = true;
+                Object.values(rowController.getChildren()).forEach(tableCell => {
+                    tableCell.enterEditMode();
+                });
+
+                this.currentlyEditing = rowController;
+            }, this);
 
             const deleteButton = new ElementController(
                 'BUTTON', {
@@ -149,14 +188,22 @@ export default class Table extends ElementController {
             deleteButton.addEventListener('click', function(this: Table) {
                 this.tableRows.splice(this.index + rowController.getIndex(), 1);
                 this.tableBody?.removeChild(rowController.nodeID as string);
-                this.connection.remove(rowController.dataProperties as object, console.log);
+                this.connection.remove(rowController.dataProperties.dataRow as object, console.log);
             }, this);
 
-            Toggle.show([deleteButton], event.clientX, event.clientY);
+            Toggle.show([editButton, deleteButton], event.clientX, event.clientY);
         }, this);
 
         for (const header of this.headers) {
-            const tableCell = new TableCell(dataRow[header.replace(/\./g, '')]);
+            const tableCell = new TableCell(
+                header,
+                dataRow[header.replace(/\./g, '')],
+                rowController.dataProperties.valuesContainer as ValuesContainer,
+                (function(this: Table, doesEdit: boolean) {
+                    return this.exitEditModeFor(rowController, doesEdit);
+                }).bind(this),
+                this.settingsInstance
+            );
 
             rowController.addChild(tableCell);
         }
@@ -164,6 +211,29 @@ export default class Table extends ElementController {
         this.tableRows.push(rowController);
 
         return rowController;
+    }
+
+    exitEditModeFor(rowController: ElementController, doesEdit: boolean) {
+        if (doesEdit) {
+            const values = rowController.dataProperties.valuesContainer;
+            if (values.areAllValid()) {
+                let input = values.parse() as { [propName: string]: any };
+                input = {...rowController.dataProperties.dataRow, ...input};
+
+                this.connection.update(rowController.dataProperties.dataRow, input, console.log);
+            } else {
+                return false;
+            }
+        }
+
+        rowController.removeClass('data-table-row-edit');
+        rowController.dataProperties.editMode = false;
+
+        Object.values(rowController.getChildren()).forEach(tableCell => {
+            tableCell.exitEditMode();
+        });
+
+        return true;
     }
 
     clearContainer() {

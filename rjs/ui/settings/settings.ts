@@ -86,7 +86,7 @@ export default class Settings extends ElementController {
     }
 
     get(section: string, entry: string) {
-        return this.settings[section].entries[entry];
+        return this.settings?.[section]?.entries?.[entry];
     }
 
     set(section: string, entry: string, setting: any) {

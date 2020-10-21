@@ -121,7 +121,7 @@ editViewButton.addEventListener('click', () => {
                     connection.getAll((err, data) => {
                         if (err)
                             throw err;
-                        const table = new table_1.default(data, connection, headers, mainContainer);
+                        const table = new table_1.default(data, connection, headers, mainContainer, settings);
                         table.activate();
                         const buttonContainerController = new elementController_1.default('DIV', {
                             classList: new Set(['action-button-container'])

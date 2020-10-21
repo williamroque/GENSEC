@@ -5,14 +5,14 @@ type ValidityClassCallback = (arg0: boolean) => void;
 
 export default class InputValue {
     private readonly typeSystem: { [propName: string]: TypeChecker };
-    private typeValid: TypeChecker;
 
+    typeValid: TypeChecker;
     content: any;
     type: string;
     setValidityClassCallback: ValidityClassCallback | null;
 
     constructor(content: any, type: string, setValidityClassCallback: ValidityClassCallback | null, settings: Settings) {
-        const testFloat = (s: string) => settings.get('formulario', 'useDecimalDot').setting ?
+        const testFloat = (s: string) => settings.get('formulario', 'useDecimalDot')?.setting ?
             /^\d[\d,]*(\.\d+)?$/.test(s) :
             /^\d[\d\.]*(,\d+)?$/.test(s);
         const datePattern = /^(Jan|Fev|Mar|Abr|Mai|Jun|Jul|Ago|Set|Out|Nov|Dez)\/\d{4}$/i;
@@ -30,7 +30,8 @@ export default class InputValue {
             port: s => /^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(s),
             checkbox: s => typeof s === 'boolean',
             username: s => /^[A-Za-z_]+$/.test(s),
-            password: s => /^[A-Za-z_]+$/.test(s)
+            password: s => /^[A-Za-z_]+$/.test(s),
+            tableString: s => /^[A-Za-zÀ-ÖØ-öø-ÿ\s\d-\.]*$/.test(s)
         };
 
         this.content = content;

@@ -52,9 +52,10 @@ class ListRow extends elementController_1.default {
     }
     setFormValues(values) {
         this.inputs.forEach((input, i) => {
+            var _a;
             if (typeof values !== 'undefined') {
                 let formattedNum = values[i].toString();
-                if ((input.type === 'float' || input.type === 'percentage') && this.settingsInstance.get('formulario', 'useDecimalDot').setting) {
+                if ((input.type === 'float' || input.type === 'percentage') && ((_a = this.settingsInstance.get('formulario', 'useDecimalDot')) === null || _a === void 0 ? void 0 : _a.setting)) {
                     formattedNum = formattedNum.replace(/\./g, ',');
                 }
                 input.setFieldValue(formattedNum);

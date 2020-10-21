@@ -59,7 +59,8 @@ class Settings extends elementController_1.default {
         }
     }
     get(section, entry) {
-        return this.settings[section].entries[entry];
+        var _a, _b, _c;
+        return (_c = (_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a[section]) === null || _b === void 0 ? void 0 : _b.entries) === null || _c === void 0 ? void 0 : _c[entry];
     }
     set(section, entry, setting) {
         this.settings[section].entries[entry].setting = setting;

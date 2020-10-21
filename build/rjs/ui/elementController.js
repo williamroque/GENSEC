@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class ElementController {
     constructor(type, properties) {
+        this.dataProperties = {};
         this.DOMTree = Object.assign(Object.assign({ type: type }, properties), { children: {} });
         this.childID = 0;
         this.rendersText = true;

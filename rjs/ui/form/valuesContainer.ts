@@ -78,15 +78,15 @@ export default class ValuesContainer {
         return areValid;
     }
 
-    clean(value: any) {
+    clean(value: any, typeTest: (s: string) => boolean) {
         if (typeof value === 'string') {
-            if (this.settingsInstance.get('formulario', 'useDecimalDot').setting) {
+            if (this.settingsInstance.get('formulario', 'useDecimalDot')?.setting) {
                 value = value.replace(/,/g, '');
             } else {
                 value = value.replace(/\./g, '');
                 value = value.replace(/,/g, '.')
             }
-            return value.replace(/\s/g, '').replace(/-/g, '/');
+            return typeTest(value) ? value : value.replace(/\s/g, '').replace(/-/g, '/');
         }
         return value
 
@@ -97,7 +97,7 @@ export default class ValuesContainer {
             return Array.from(inputValue.content);
         }
 
-        const content = this.clean(inputValue.content);
+        const content = this.clean(inputValue.content, inputValue.typeValid);
         switch (inputValue.type) {
             case 'int':
                 return parseInt(content);

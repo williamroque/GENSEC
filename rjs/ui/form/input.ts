@@ -6,11 +6,11 @@ import ValuesContainer from './valuesContainer';
 export interface InputProperties {
     id: string,
     label: string,
-    group: string,
     type: string,
-    disabled: boolean,
     width: number,
-    incrementGroup: string,
+    group?: string,
+    disabled?: boolean,
+    incrementGroup?: string,
     drawDefault?: string,
     initialOffset?: number
 }
@@ -21,9 +21,9 @@ export default class Input extends ElementController {
     private readonly valuesContainer: ValuesContainer;
     private readonly id: string;
     private readonly label: string;
-    private readonly group: string;
+    private readonly group?: string;
     private readonly disabled: boolean;
-    private readonly incrementGroup: string;
+    private readonly incrementGroup?: string;
     private readonly value: InputValue;
     private readonly listID?: string;
 
@@ -47,7 +47,7 @@ export default class Input extends ElementController {
         this.group = properties.group;
         this.type = properties.type;
         this.incrementGroup = properties.incrementGroup;
-        this.disabled = properties.disabled;
+        this.disabled = properties.disabled || false;
 
         this.listID = listID;
 
@@ -98,6 +98,10 @@ export default class Input extends ElementController {
         }
 
         this.updateFormValue('');
+    }
+
+    getValue() {
+        return this.value.content;
     }
 
     setValidityClassCallback(isValid: boolean) {
@@ -161,7 +165,7 @@ export default class Input extends ElementController {
         this.updateFormValue(target.value);
 
         if (this.type === 'anualIncrement' || this.type === 'monthlyIncrement') {
-            if (this.value.test()) {
+            if (this.value.test() && typeof this.incrementGroup !== 'undefined') {
                 this.setAnchorCallback?.(
                     this.incrementGroup,
                     target.value,

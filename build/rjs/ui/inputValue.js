@@ -2,9 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class InputValue {
     constructor(content, type, setValidityClassCallback, settings) {
-        const testFloat = (s) => settings.get('formulario', 'useDecimalDot').setting ?
-            /^\d[\d,]*(\.\d+)?$/.test(s) :
-            /^\d[\d\.]*(,\d+)?$/.test(s);
+        const testFloat = (s) => {
+            var _a;
+            return ((_a = settings.get('formulario', 'useDecimalDot')) === null || _a === void 0 ? void 0 : _a.setting) ?
+                /^\d[\d,]*(\.\d+)?$/.test(s) :
+                /^\d[\d\.]*(,\d+)?$/.test(s);
+        };
         const datePattern = /^(Jan|Fev|Mar|Abr|Mai|Jun|Jul|Ago|Set|Out|Nov|Dez)\/\d{4}$/i;
         this.typeSystem = {
             int: s => /^\d[\d\.]*$/.test(s),
@@ -19,7 +22,8 @@ class InputValue {
             port: s => /^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(s),
             checkbox: s => typeof s === 'boolean',
             username: s => /^[A-Za-z_]+$/.test(s),
-            password: s => /^[A-Za-z_]+$/.test(s)
+            password: s => /^[A-Za-z_]+$/.test(s),
+            tableString: s => /^[A-Za-zÀ-ÖØ-öø-ÿ\s\d-\.]*$/.test(s)
         };
         this.content = content;
         if (typeof this.content === 'string') {

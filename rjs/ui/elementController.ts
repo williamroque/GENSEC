@@ -5,7 +5,7 @@ export interface Properties {
 }
 
 export default class ElementController {
-    private DOMTree: Properties & { type: string, children: { [propName: string]: ElementController } };
+    private DOMTree: Properties & { type: string, children: { [propName: string]: any } };
     private childID: number;
     private rendersText: boolean;
     
@@ -13,7 +13,7 @@ export default class ElementController {
     element?: HTMLElement;
     prepend?: boolean;
 
-    dataProperties?: {[propName: string]: any};
+    dataProperties: {[propName: string]: any} = {};
 
     constructor(type: string, properties: Properties) {
         this.DOMTree = {

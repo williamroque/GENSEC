@@ -35,6 +35,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
     background: #0A0A0A;
     z-index: 99;
 }
@@ -42,7 +43,7 @@ html, body {
 .toggle-button {
     width: 250px;
     height: 60px;
-    margin: 3px;
+    margin: 3px 3px 0 3px;
     background: none;
     border: solid 2px #C0B283;
     outline: none;
@@ -52,6 +53,10 @@ html, body {
     font-weight: 200;
     text-transform: uppercase;
     cursor: pointer;
+}
+
+.toggle-button:last-child {
+    margin-bottom: 3px;
 }
 
 .toggle-button:active {

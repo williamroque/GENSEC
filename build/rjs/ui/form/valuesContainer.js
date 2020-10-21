@@ -73,16 +73,17 @@ class ValuesContainer {
         }
         return areValid;
     }
-    clean(value) {
+    clean(value, typeTest) {
+        var _a;
         if (typeof value === 'string') {
-            if (this.settingsInstance.get('formulario', 'useDecimalDot').setting) {
+            if ((_a = this.settingsInstance.get('formulario', 'useDecimalDot')) === null || _a === void 0 ? void 0 : _a.setting) {
                 value = value.replace(/,/g, '');
             }
             else {
                 value = value.replace(/\./g, '');
                 value = value.replace(/,/g, '.');
             }
-            return value.replace(/\s/g, '').replace(/-/g, '/');
+            return typeTest(value) ? value : value.replace(/\s/g, '').replace(/-/g, '/');
         }
         return value;
     }
@@ -90,7 +91,7 @@ class ValuesContainer {
         if (inputValue.type === 'filePaths') {
             return Array.from(inputValue.content);
         }
-        const content = this.clean(inputValue.content);
+        const content = this.clean(inputValue.content, inputValue.typeValid);
         switch (inputValue.type) {
             case 'int':
                 return parseInt(content);

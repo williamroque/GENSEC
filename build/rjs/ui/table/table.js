@@ -4,10 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const elementController_1 = __importDefault(require("../elementController"));
+const valuesContainer_1 = __importDefault(require("../form/valuesContainer"));
 const toggle_1 = __importDefault(require("../toggle"));
 const tableCell_1 = __importDefault(require("./tableCell"));
 class Table extends elementController_1.default {
-    constructor(data, connection, headers, container) {
+    constructor(data, connection, headers, container, settingsInstance) {
         super('TABLE', {
             classList: new Set(['data-table'])
         });
@@ -19,6 +20,7 @@ class Table extends elementController_1.default {
         this.connection = connection;
         this.headers = headers;
         this.container = container;
+        this.settingsInstance = settingsInstance;
         this.tableRows = [];
         this.index = 0;
         this.seedTree();
@@ -95,15 +97,42 @@ class Table extends elementController_1.default {
             }
             scrollbarElement.style.top = `${(this.index * this.rowHeight + tableBody.scrollTop) * (viewHeight - 10) / (this.tableRows.length * this.rowHeight)}px`;
         }, this);
+        document.addEventListener('keydown', (function (e) {
+            const { key } = e;
+            if (key === 'Escape' && typeof this.currentlyEditing !== 'undefined') {
+                this.exitEditModeFor(this.currentlyEditing, false);
+            }
+        }).bind(this), false);
     }
     addRow(dataRow) {
         const rowController = new elementController_1.default('TR', {
             classList: new Set(['data-table-row'])
         });
-        rowController.dataProperties = dataRow;
+        rowController.dataProperties = {
+            dataRow: dataRow,
+            editMode: false,
+            valuesContainer: new valuesContainer_1.default(this.settingsInstance)
+        };
         rowController.addEventListener('click', function (e) {
             const event = e;
             event.stopPropagation();
+            if (rowController.dataProperties.editMode)
+                return;
+            const editButton = new elementController_1.default('BUTTON', {
+                classList: new Set(['toggle-button']),
+                text: 'Editar'
+            });
+            editButton.addEventListener('click', function () {
+                if (typeof this.currentlyEditing !== 'undefined') {
+                    this.exitEditModeFor(this.currentlyEditing, false);
+                }
+                rowController.addClass('data-table-row-edit');
+                rowController.dataProperties.editMode = true;
+                Object.values(rowController.getChildren()).forEach(tableCell => {
+                    tableCell.enterEditMode();
+                });
+                this.currentlyEditing = rowController;
+            }, this);
             const deleteButton = new elementController_1.default('BUTTON', {
                 classList: new Set(['toggle-button']),
                 text: 'Deletar'
@@ -111,18 +140,38 @@ class Table extends elementController_1.default {
             deleteButton.addEventListener('click', function () {
                 var _a;
                 this.tableRows.splice(this.index + rowController.getIndex(), 1);
-                console.log(rowController.nodeID);
                 (_a = this.tableBody) === null || _a === void 0 ? void 0 : _a.removeChild(rowController.nodeID);
-                this.connection.remove(rowController.dataProperties, console.log);
+                this.connection.remove(rowController.dataProperties.dataRow, console.log);
             }, this);
-            toggle_1.default.show([deleteButton], event.clientX, event.clientY);
+            toggle_1.default.show([editButton, deleteButton], event.clientX, event.clientY);
         }, this);
         for (const header of this.headers) {
-            const tableCell = new tableCell_1.default(dataRow[header.replace(/\./g, '')]);
+            const tableCell = new tableCell_1.default(header, dataRow[header.replace(/\./g, '')], rowController.dataProperties.valuesContainer, (function (doesEdit) {
+                return this.exitEditModeFor(rowController, doesEdit);
+            }).bind(this), this.settingsInstance);
             rowController.addChild(tableCell);
         }
         this.tableRows.push(rowController);
         return rowController;
+    }
+    exitEditModeFor(rowController, doesEdit) {
+        if (doesEdit) {
+            const values = rowController.dataProperties.valuesContainer;
+            if (values.areAllValid()) {
+                let input = values.parse();
+                input = Object.assign(Object.assign({}, rowController.dataProperties.dataRow), input);
+                this.connection.update(rowController.dataProperties.dataRow, input, console.log);
+            }
+            else {
+                return false;
+            }
+        }
+        rowController.removeClass('data-table-row-edit');
+        rowController.dataProperties.editMode = false;
+        Object.values(rowController.getChildren()).forEach(tableCell => {
+            tableCell.exitEditMode();
+        });
+        return true;
     }
     clearContainer() {
         let child;

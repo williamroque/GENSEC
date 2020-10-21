@@ -159,7 +159,7 @@ editViewButton.addEventListener('click', () => {
                     connection.getAll((err, data) => {
                         if (err) throw err;
 
-                        const table = new Table(data, connection, headers, mainContainer);
+                        const table = new Table(data, connection, headers, mainContainer, settings);
                         table.activate();
 
                         const buttonContainerController = new ElementController(

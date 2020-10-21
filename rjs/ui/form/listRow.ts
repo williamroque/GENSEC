@@ -105,7 +105,7 @@ export default class ListRow extends ElementController {
         this.inputs.forEach((input: Input, i: number) => {
             if (typeof values !== 'undefined') {
                 let formattedNum = values[i].toString();
-                if ((input.type === 'float' || input.type === 'percentage') && this.settingsInstance.get('formulario', 'useDecimalDot').setting) {
+                if ((input.type === 'float' || input.type === 'percentage') && this.settingsInstance.get('formulario', 'useDecimalDot')?.setting) {
                     formattedNum = formattedNum.replace(/\./g, ',');
                 }
 

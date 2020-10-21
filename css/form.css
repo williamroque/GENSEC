@@ -39,8 +39,8 @@
 
 .form-input:focus,
 .form-input-active {
-    border-bottom-color: #C0B283 !important;
-    transition-duration: .1s !important;
+    border-bottom-color: #C0B283;
+    transition-duration: .1s;
 }
 
 .percentage-input {
@@ -59,6 +59,7 @@
     transition-duration: .1s;
 }
 
+.data-form-cell:focus-within .form-input-label,
 .form-cell:focus-within .form-input-label,
 .form-input-label-active {
     font-weight: bold;
@@ -95,16 +96,16 @@
 }
 
 .form-input-label-invalid {
-    color: #9a4d4d;
+    color: #9a4d4d !important;
     font-weight: 600;
 }
 
 .percentage-symbol-invalid {
-    color: #7d5353;
+    color: #7d5353 !important;
 }
 
 .form-input[disabled] {
-    color: #797575;
+    color: #797575 !important;
     border-bottom-color: #b5b5b5 !important;
     background: none;
 }
