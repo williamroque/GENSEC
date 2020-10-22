@@ -13,6 +13,7 @@ import Connection from '../rjs/communication/connection';
 import Manifest, { SettingsSchema } from '../mjs/filesystem/manifest';
 import { System } from '../mjs/filesystem/filesystem';
 import Table from './ui/table/table';
+import { MongoClient } from 'mongodb';
 
 const sidebar = document.querySelector('#sidebar') as HTMLDivElement;
 
@@ -96,7 +97,7 @@ buildViewButton.addEventListener('click', () => {
                     classList: new Set(['form-button', 'action-button'])
                 }
             );
-            executarButtonController.addEventListener('click', function() {
+            executarButtonController.addEventListener('click', async function() {
                 const values = form.valuesContainer;
                 if (values.areAllValid()) {
                     let input = values.parse() as { [propName: string]: any };
@@ -107,11 +108,47 @@ buildViewButton.addEventListener('click', () => {
                         if (!input['output-path']) return;
                     }
 
-                    Communication.requestExecutePackage(
-                        manifest.programName,
-                        manifest.packageName,
-                        input
-                    );
+                    if (manifest?.requiresDatabaseAccess) {
+                        if (!('dataHeaders' in manifest)) return;
+
+                        try {
+                            const headers = manifest.dataHeaders as unknown as string[];
+                            const connection = new Connection(
+                                manifest.programName,
+                                manifest.packageName,
+                                headers,
+                                settings.get('network', 'ip').setting,
+                                settings.get('network', 'port').setting,
+                                settings.get('credentials', 'username').setting,
+                                settings.get('credentials', 'password').setting,
+                                certificatePath
+                            );
+
+                            const result = await connection.connect();
+                            if (!(result instanceof MongoClient)) return;
+
+                            connection.getAll((err, data) => {
+                                if (err !== null) return;
+
+                                input['data'] = data;
+                                input['headers'] = headers;
+
+                                Communication.requestExecutePackage(
+                                    manifest.programName,
+                                    manifest.packageName,
+                                    input
+                                );
+                            });
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    } else {
+                        Communication.requestExecutePackage(
+                            manifest.programName,
+                            manifest.packageName,
+                            input
+                        );
+                    }
                 }
             }, this);
             buttonContainerController.addChild(executarButtonController);
