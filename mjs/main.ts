@@ -1,4 +1,4 @@
-const ISDEVDIST = true;
+const ISDEVDIST = false;
 
 import path from 'path';
 import { app, Menu, shell } from 'electron';
@@ -131,21 +131,29 @@ const menuTemplate = [
             }
         }]
     },
-    ...(ISDEVDIST ? [{
+    {
         label: 'Developer',
         submenu: [
             {
                 label: 'Toggle Developer Tools',
                 accelerator: 'CmdOrCtrl+Alt+I',
-                click: () => mainWindow.toggleDevTools()
+                click: async () => {
+                    if (ISDEVDIST || await Dialog.passwordPrompt('3d88a235ac0f4065c043d705e74e3f0ff0393e76633dfe4c90fddd269dac3b5e')) {
+                        mainWindow.toggleDevTools();
+                    }
+                }
             },
             {
                 label: 'Open Application Support',
                 accelerator: 'CmdOrCtrl+Shift+A',
-                click: () => shell.openPath(app.getPath('userData'))
+                click: async () => {
+                    if (ISDEVDIST || await Dialog.passwordPrompt('3d88a235ac0f4065c043d705e74e3f0ff0393e76633dfe4c90fddd269dac3b5e')) {
+                        shell.openPath(app.getPath('userData'));
+                    }
+                }
             }
         ]
-    }] : []),
+    },
     {
         label: 'Help',
         role: 'help',
