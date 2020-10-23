@@ -209,13 +209,32 @@ export default class SettingsInput extends ElementController {
 
     handleKeyEvent(e: Event) {
         const event = e as KeyboardEvent;
+        const target = this.query('input')?.element as HTMLInputElement;
 
-        if (event.key.length === 1 && !event.metaKey && !event.ctrlKey || event.key === 'Backspace') {
+        if (event.key === 'Tab') {
+            const inputs = document.querySelectorAll('.form-input');
+            const currentIndex = Array.from(inputs).findIndex((input: Element) => input === target);
+
+            if (event.shiftKey) {
+                if (currentIndex > 0) {
+                    const previousInput = inputs[currentIndex - 1] as HTMLInputElement;
+
+                    previousInput.focus();
+                    previousInput.setSelectionRange(0, previousInput.value.length);
+                }
+            } else {
+                if (currentIndex < inputs.length - 1) {
+                    const nextInput = inputs[currentIndex + 1] as HTMLInputElement;
+
+                    nextInput.focus();
+                    nextInput.setSelectionRange(0, nextInput.value.length);
+                }
+            }
+        } else if (event.key.length === 1 && !event.metaKey && !event.ctrlKey || event.key === 'Backspace') {
             this.updateField(event.key)
 
             event.preventDefault();
         } else {
-            const target = this.query('input')?.element as HTMLInputElement;
 
             const selStart = target.selectionStart as number;
             const selEnd = target.selectionEnd as number;

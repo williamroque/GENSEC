@@ -52,7 +52,6 @@ export default class Input extends ElementController {
         this.listID = listID;
 
         this.setAnchorCallback = setAnchorCallback;
-
         this.getIndexCallback = getIndexCallback;
 
         this.value = new InputValue('', this.type, this.setValidityClassCallback.bind(this), settingsInstance);
@@ -80,6 +79,13 @@ export default class Input extends ElementController {
         if (this.disabled) {
             inputController.element?.setAttribute('disabled', 'disabled');
         }
+        inputController.addEventListener('keydown', e => {
+            const event = e as KeyboardEvent;
+
+            if (event.key === 'Tab') {
+                e.preventDefault();
+            }
+        }, this);
         inputController.addEventListener('keyup', this.handleKeyEvent, this);
         this.addChild(inputController, 'input');
 
@@ -160,17 +166,40 @@ export default class Input extends ElementController {
         }
     }
 
-    handleKeyEvent() {
+    handleKeyEvent(e: Event) {
+        const event = e as KeyboardEvent;
         const target = this.query('input')?.element as HTMLInputElement;
-        this.updateFormValue(target.value);
 
-        if (this.type === 'anualIncrement' || this.type === 'monthlyIncrement') {
-            if (this.value.test() && typeof this.incrementGroup !== 'undefined') {
-                this.setAnchorCallback?.(
-                    this.incrementGroup,
-                    target.value,
-                    this.type
-                );
+        if (event.key === 'Tab') {
+            const inputs = document.querySelectorAll('.form-input');
+            const currentIndex = Array.from(inputs).findIndex((input: Element) => input === target);
+
+            if (event.shiftKey) {
+                if (currentIndex > 0) {
+                    const previousInput = inputs[currentIndex - 1] as HTMLInputElement;
+
+                    previousInput.focus();
+                    previousInput.setSelectionRange(0, previousInput.value.length);
+                }
+            } else {
+                if (currentIndex < inputs.length - 1) {
+                    const nextInput = inputs[currentIndex + 1] as HTMLInputElement;
+
+                    nextInput.focus();
+                    nextInput.setSelectionRange(0, nextInput.value.length);
+                }
+            }
+        } else {
+            this.updateFormValue(target.value);
+
+            if (this.type === 'anualIncrement' || this.type === 'monthlyIncrement') {
+                if (this.value.test() && typeof this.incrementGroup !== 'undefined') {
+                    this.setAnchorCallback?.(
+                        this.incrementGroup,
+                        target.value,
+                        this.type
+                    );
+                }
             }
         }
     }
