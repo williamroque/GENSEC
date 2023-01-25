@@ -23,6 +23,7 @@ export default class InputValue {
             percentage: testFloat,
             percentageOptional: s => s === '' || testFloat(s),
             dateString: s => datePattern.test(s),
+            fullDateString: s => /^([0-2]?[0-9]|3[0-1])\/(0?[1-9]|1[0-2])\/\d{4}$/.test(s), // TODO: Replace this before the year 10,000
             filePaths: s => this.content.size > 0,
             anualIncrement: s => /^\d{4}$/.test(s),
             monthlyIncrement: s => datePattern.test(s),
@@ -31,7 +32,8 @@ export default class InputValue {
             checkbox: s => typeof s === 'boolean',
             username: s => /^[A-Za-z_]+$/.test(s),
             password: s => /^[A-Za-z_]+$/.test(s),
-            tableString: s => /^[A-Za-zÀ-ÖØ-öø-ÿ\s\d-\.]*$/.test(s)
+            tableString: s => /^[A-Za-zÀ-ÖØ-öø-ÿ\s\d-\.]*$/.test(s),
+            idString: s => /^[A-Za-z\d]+$/.test(s)
         };
 
         this.content = content;
