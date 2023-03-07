@@ -23,7 +23,7 @@ export default class Python {
     
         return new Promise(resolve => {
             progressWindow.addWebListener('did-finish-load', () => {
-                const subprocess = spawn('python', args);
+                const subprocess = spawn('python3', args);
 
                 if (input !== null) {
                     subprocess.stdin.write(JSON.stringify(input));

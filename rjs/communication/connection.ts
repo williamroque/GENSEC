@@ -10,17 +10,16 @@ export default class Connection {
 
     private db?: Db;
 
-    constructor(dbName: string, collectionName: string, dataHeaders: string[], host: string, port: string, username: string, password: string, certificatePath: string) {
-        const url = `mongodb://${username}:${password}@${host}:${port}/?tls=true`;
+    constructor(dbName: string, collectionName: string, dataHeaders: string[], host: string, port: string, username: string, password: string) {
+        const url = `mongodb://${username}:${password}@${host}:${port}`;
 
         this.dbName = dbName;
         this.collectionName = collectionName;
         this.dataHeaders = dataHeaders;
 
-        this.client = new MongoClient(url, {
-            tlsCAFile: certificatePath,
-            rejectUnauthorized: false
-        });
+        console.log(url);
+
+        this.client = new MongoClient(url);
     }
 
     connect() {

@@ -106,32 +106,6 @@ const menuTemplate = [
         }]
     },
     {
-        label: 'Network',
-        submenu: [{
-            label: 'Add Certificate',
-            accelerator: 'CmdOrCtrl+Shift+C',
-            click: () => {
-                const certificatePath = Dialog.createOpenDialog([{ name: 'Certificate', extensions: ['pem'] }]);
-                const certificatesDirectory = path.join(app.getPath('userData'), 'cert');
-
-                if (typeof certificatePath !== 'undefined') {
-                    try {
-                        if (!fs.existsSync(certificatesDirectory)) {
-                            fs.mkdirSync(certificatesDirectory);
-                        }
-
-                        fs.copyFileSync(
-                            certificatePath[0],
-                            path.join(certificatesDirectory, path.basename(certificatePath[0]))
-                        );
-                    } catch (error) {
-                        console.log(error);
-                    }
-                }
-            }
-        }]
-    },
-    {
         label: 'Developer',
         submenu: [
             {

@@ -26,7 +26,6 @@ const editViewButton = document.querySelector('#show-edit-view') as HTMLButtonEl
 const buildViewButton = document.querySelector('#show-build-view') as HTMLButtonElement;
 
 const appDataPath = app.getPath('userData');
-const certificatePath = path.join(appDataPath, 'cert', 'gensec.pem');
 const systemPath = path.join(appDataPath, 'system');
 
 settingsViewButton.addEventListener('click', () => {
@@ -120,8 +119,7 @@ buildViewButton.addEventListener('click', () => {
                                 settings.get('network', 'ip').setting,
                                 settings.get('network', 'port').setting,
                                 settings.get('credentials', 'username').setting,
-                                settings.get('credentials', 'password').setting,
-                                certificatePath
+                                settings.get('credentials', 'password').setting
                             );
 
                             const result = await connection.connect();
@@ -189,8 +187,7 @@ editViewButton.addEventListener('click', () => {
                     settings.get('network', 'ip').setting,
                     settings.get('network', 'port').setting,
                     settings.get('credentials', 'username').setting,
-                    settings.get('credentials', 'password').setting,
-                    certificatePath
+                    settings.get('credentials', 'password').setting
                 );
                 connection.connect().then(() => {
                     connection.getAll((err, data) => {

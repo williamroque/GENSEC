@@ -1,46 +1,51 @@
 {
-  "name": "gensec",
-  "productName": "GENSEC",
-  "version": "1.0.0",
-  "description": "",
-  "build": {
-    "appId": "com.ethos.gensec",
-    "mac": {
-      "target": "dmg",
-      "icon": "assets/icon.png",
-      "darkModeSupport": true
+    "name": "gensec",
+    "productName": "GENSEC",
+    "version": "1.0.0",
+    "description": "",
+    "build": {
+        "appId": "com.ethos.gensec",
+        "extends": null,
+        "files": [
+            "build/**/*",
+            "package.json"
+        ],
+        "mac": {
+            "target": "dmg",
+            "icon": "assets/icon.png",
+            "darkModeSupport": true
+        },
+        "win": {
+            "target": "nsis",
+            "icon": "assets/icon.png"
+        }
     },
-    "win": {
-      "target": "nsis",
-      "icon": "assets/icon.png"
+    "scripts": {
+        "start": "electron .",
+        "dist-all": "electron-builder -mw",
+        "dist-win": "electron-builder -w",
+        "generate-certificate": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out gensec.pem -days 365 -nodes && cat key.pem >> gensec.pem && rm key.pem && mv gensec.pem ~/desktop",
+        "mongo-dump": "mongodump -d gensec -o backup",
+        "mongo-restore": "mongorestore -d gensec backup",
+        "compile": "rm -rf build && tsc",
+        "copy": "cp -r html build && cp -r css build && cp -r assets build"
+    },
+    "main": "build/mjs/main.js",
+    "author": "William Roque",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/rimraf": "^3.0.0",
+        "@types/unzipper": "^0.10.3",
+        "electron": "^10.1.2",
+        "electron-builder": "^20.40.2",
+        "typescript": "^4.0.3"
+    },
+    "dependencies": {
+        "@types/mongodb": "^3.5.27",
+        "electron-settings": "^4.0.2",
+        "electron-window-state": "^5.0.3",
+        "mongodb": "^3.6.2",
+        "rimraf": "^3.0.2",
+        "unzipper": "^0.10.11"
     }
-  },
-  "scripts": {
-    "start": "electron .",
-    "dist-all": "electron-builder -mw",
-    "dist": "electron-builder",
-    "generate-certificate": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out gensec.pem -days 7 -nodes && cat key.pem >> gensec.pem && rm key.pem && mv gensec.pem ~/desktop",
-    "mongo-dump": "mongodump -d gensec -o backup",
-    "mongo-restore": "mongorestore -d gensec backup",
-    "compile": "rm -rf build && tsc",
-    "copy": "cp -r html build && cp -r css build && cp -r assets build"
-  },
-  "main": "./build/mjs/main.js",
-  "author": "William Roque",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/rimraf": "^3.0.0",
-    "@types/unzipper": "^0.10.3",
-    "electron": "^10.1.2",
-    "electron-builder": "^20.40.2",
-    "typescript": "^4.0.3"
-  },
-  "dependencies": {
-    "@types/mongodb": "^3.5.27",
-    "electron-settings": "^4.0.2",
-    "electron-window-state": "^5.0.3",
-    "mongodb": "^3.6.2",
-    "rimraf": "^3.0.2",
-    "unzipper": "^0.10.11"
-  }
 }
